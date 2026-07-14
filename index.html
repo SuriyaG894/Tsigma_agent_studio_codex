@@ -2724,9 +2724,9 @@
       ["/access", "Edit KB Access Control", ["both", "admin"], "admin"],
       ["/kbadmin", "Open KB Admin Panel", ["admin"], "admin"],
       ["/settings", "System Settings", ["admin"], null],
-      ["/stories-active", "List User Stories in Active Draft", ["ba", "developer", "ba_admin", "dev_admin", "both", "admin"], "read"],
-      ["/stories-steering", "List User Stories in Steering Doc", ["ba", "developer", "ba_admin", "dev_admin", "both", "admin"], "read"],
-      ["/stories-plan", "List User Stories in Plan Generation", ["ba", "developer", "ba_admin", "dev_admin", "both", "admin"], "read"],
+      ["/stories-active", "List User Stories in Active Draft", ["ba", "ba_admin", "both", "admin"], "read"],
+      ["/stories-steering", "List User Stories in Steering Doc", ["developer", "dev_admin", "both", "admin"], "read"],
+      ["/stories-plan", "List User Stories in Plan Generation", ["developer", "dev_admin", "both", "admin"], "read"],
       ["/stories-completed", "List User Stories in Completed", ["ba", "developer", "ba_admin", "dev_admin", "both", "admin"], "read"],
     ];
 
@@ -3598,11 +3598,19 @@
 
         case '/search':
         case '/gap':
-        case '/stories-active':
-        case '/stories-steering':
-        case '/stories-plan':
         case '/stories-completed':
           // Ability to access KB: requires at least explicit 'read' status across profiles
+          return ['read', 'write', 'admin'].includes(accessLevel);
+
+        case '/stories-active':
+          // Visible to BA, BA Admin, Full Stack (Dev/Dev Admin cannot browse Active Draft stories)
+          if (!['ba', 'ba_admin', 'both'].includes(role)) return false;
+          return ['read', 'write', 'admin'].includes(accessLevel);
+
+        case '/stories-steering':
+        case '/stories-plan':
+          // Visible to Dev, Dev Admin, Full Stack (BA/BA Admin cannot browse Steering Doc / Plan Generation stories)
+          if (!['developer', 'dev_admin', 'both'].includes(role)) return false;
           return ['read', 'write', 'admin'].includes(accessLevel);
 
         case '/upload':
