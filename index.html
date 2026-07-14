@@ -3971,7 +3971,18 @@
     function resolveCommand(queryText) {
       const bySlash = COMMANDS.find(c => queryText.trim().toLowerCase().startsWith(c[0]));
       if (bySlash) return bySlash;
-      return findCommandByLabel(queryText.trim());
+      const byLabel = findCommandByLabel(queryText.trim());
+      if (byLabel) return byLabel;
+      const lower = queryText.toLowerCase();
+      if (/user\s*stor|specif|spec\b/.test(lower)) return COMMANDS.find(c => c[0] === '/story');
+      if (/impl.*plan|plan\b/.test(lower)) return COMMANDS.find(c => c[0] === '/plan');
+      if (/search|retriev|find|document/.test(lower)) return COMMANDS.find(c => c[0] === '/search');
+      if (/gap|miss|valid/.test(lower)) return COMMANDS.find(c => c[0] === '/gap');
+      if (/steer|component|api\s*endpoint/.test(lower)) return COMMANDS.find(c => c[0] === '/steering');
+      if (/access|role|perm/.test(lower)) return COMMANDS.find(c => c[0] === '/access');
+      if (/upload|import.*file/.test(lower)) return COMMANDS.find(c => c[0] === '/upload');
+      if (/push|export|sync.*devops/.test(lower)) return COMMANDS.find(c => c[0] === '/push');
+      return COMMANDS.find(c => c[0] === '/story');
     }
 
     function currentMode() {
@@ -4307,6 +4318,10 @@
       const runStages = COMMAND_STAGES[key] || FULL_STAGES;
       const blocked = cmd ? !commandAllowed(cmd) : false;
       const mode = currentMode();
+      const selectedKb = document.getElementById('kbSelect').value;
+      const kbData = KB_STORY_DATA[selectedKb] || KB_STORY_DATA["Claims Management KB"];
+      const runContext = { kb: selectedKb, kbData, stageEdits: {} };
+      window._activeRunContext = runContext;
       const activeConv = ConversationManager.active;
       if (activeConv && activeConv.title === 'New Conversation') {
         activeConv.title = queryText.slice(0, 42);
@@ -4364,11 +4379,12 @@
       const steps = timelineEl.querySelectorAll('.step');
 
       function renderDocList() {
+        const docs = kbData.retrievedDocs || RETRIEVED_DOCS;
         return `
       <div class="result-box">
-        <div class="result-head"><b>Retrieved Documents (${RETRIEVED_DOCS.length})</b><span class="conf">98% confidence</span></div>
+        <div class="result-head"><b>Retrieved Documents (${docs.length})</b><span class="conf">98% confidence</span></div>
         <div class="doc-list">
-          ${RETRIEVED_DOCS.map(d => `
+          ${docs.map(d => `
             <div class="doc-row">
               <span class="doc-title">${d.title}</span>
               <span class="doc-wi mono">WI: ${d.wi}</span>
@@ -4379,11 +4395,12 @@
       }
 
       function renderGapList() {
+        const gaps = kbData.gaps || GAP_ANALYSIS;
         return `
       <div class="result-box">
-        <div class="result-head"><b>Knowledge Gaps Found (${GAP_ANALYSIS.length})</b><span class="conf">Validation stage</span></div>
+        <div class="result-head"><b>Knowledge Gaps Found (${gaps.length})</b><span class="conf">Validation stage</span></div>
         <div class="gap-list">
-          ${GAP_ANALYSIS.map(g => `
+          ${gaps.map(g => `
             <div class="gap-row">
               <span class="gap-priority ${g.priority.toLowerCase()}">${g.priority}</span>
               <div class="gap-body">
@@ -4397,27 +4414,27 @@
       }
 
       function renderStorySpec() {
-        const s = STORY_SAMPLE;
+        const s = kbData.specs || STORY_SAMPLE;
         return `
       <div class="result-box">
         <div class="result-head"><b>${s.title}</b><span class="conf">${s.priority} · ${s.points} PTS</span></div>
-        <div class="tag-row">${s.tags.map(t => `<span class="story-tag">${t}</span>`).join('')}</div>
-        <p class="spec-context">${s.context}</p>
-        <div class="narrative-block">As ${s.narrative.role},<br>I want ${s.narrative.want}<br>So that ${s.narrative.so}</div>
+        <div class="tag-row">${s.tags ? s.tags.map(t => `<span class="story-tag">${t}</span>`).join('') : (kbData.tags || []).map(t => `<span class="story-tag">${t}</span>`).join('')}</div>
+        <p class="spec-context">${s.context || kbData.context || ''}</p>
+        <div class="narrative-block">As ${s.narrative ? s.narrative.role : kbData.narrative.role},<br>I want ${s.narrative ? s.narrative.want : kbData.narrative.want}<br>So that ${s.narrative ? s.narrative.so : kbData.narrative.so}</div>
         <b class="ac-heading">Acceptance Criteria</b>
-        ${s.acceptanceCriteria.map(ac => `
+        ${(s.acceptanceCriteria || []).map(ac => `
           <div class="ac-block">
             <b>${ac.id} ${ac.title}</b>
             <p>Given ${ac.given}<br>When ${ac.when.replace(/\n/g, '<br>')}<br>Then ${ac.then}</p>
           </div>`).join('')}
         <div class="nfr-grid">
-          ${s.nfr.map(n => `<div class="nfr-item"><div class="nfr-label">${n.label.toUpperCase()}</div><p>${n.detail}</p></div>`).join('')}
+          ${(s.nfr || []).map(n => `<div class="nfr-item"><div class="nfr-label">${n.label.toUpperCase()}</div><p>${n.detail}</p></div>`).join('')}
         </div>
       </div>`;
       }
 
       function renderSteeringDoc() {
-        const e = EMPLOYEE_STEERING;
+        const e = getSteeringData(selectedKb);
         return `
       <div class="result-box">
         <div class="result-head"><b>${e.title}</b><span class="conf">Steering Doc</span></div>
@@ -4450,7 +4467,7 @@
       }
 
       function renderImplementationPlan() {
-        const p = EMPLOYEE_PLAN;
+        const p = getPlanData(selectedKb);
         return `
       <div class="result-box">
         <div class="result-head"><b>${p.title}</b><span class="conf">Implementation Plan</span></div>
@@ -4508,12 +4525,13 @@
       function renderSearchSummary() {
         const kb = document.getElementById('kbSelect').value;
         const q = (queryText.replace(/^\/search\s*/i, '').trim() || cmd?.[1] || 'current KB context');
+        const docs = kbData.retrievedDocs || RETRIEVED_DOCS;
         return `
       <div class="result-box">
         <div class="result-head"><b>Search Results</b><span class="conf">${kb}</span></div>
         <div class="ac-block"><b>Query</b><p>${q}</p></div>
         <div class="doc-list">
-          ${RETRIEVED_DOCS.slice(0, 3).map(d => `
+          ${docs.slice(0, 3).map(d => `
             <div class="doc-row">
               <span class="doc-title">${d.title}</span>
               <span class="doc-wi mono">WI: ${d.wi}</span>
@@ -5538,14 +5556,7 @@
           case '/stories-steering': return renderStoryListResult('steering_doc');
           case '/stories-plan': return renderStoryListResult('plan_generation');
           case '/stories-completed': return renderStoryListResult('completed');
-          default: return `
-        <div class="result-box">
-          <div class="result-head"><b>Result Generated Successfully</b><span class="conf">98% confidence</span></div>
-          <div class="metrics">
-            <div><b>1</b>Orchestrated frame</div>
-            <div><b>1.8s</b>Execution Time</div>
-          </div>
-        </div>`;
+          default: return renderStoryWizardCard(null, 4, runSeq);
         }
       }
 
@@ -5557,6 +5568,28 @@
 
         const key = cmd ? cmd[0] : null;
         resultSlot.innerHTML = renderResponseForCommand(key);
+
+        if (window._activeRunContext && window._activeRunContext.stageEdits) {
+          var edits = window._activeRunContext.stageEdits;
+          if (edits[3 + '_content']) {
+            var narrativeBlock = resultSlot.querySelector('.narrative-block');
+            if (narrativeBlock) {
+              var lines = edits[3 + '_content'].split('\n').filter(function(l) { return l.trim(); });
+              narrativeBlock.innerHTML = lines.join('<br>');
+            }
+          }
+          if (edits[1 + '_content']) {
+            var insightBox = resultSlot.querySelector('.result-box');
+            if (insightBox) {
+              var extraInsight = document.createElement('div');
+              extraInsight.style.cssText = 'padding:8px 12px;font-size:11px;background:#FFF7ED;border-radius:8px;border:1px solid #FED7AA;margin-top:8px';
+              extraInsight.innerHTML = '<b>Manual Notes:</b> ' + edits[1 + '_content'].replace(/\n/g, '<br>');
+              insightBox.appendChild(extraInsight);
+            }
+          }
+          window._activeRunContext = null;
+        }
+
         let handledAsInteractive = false;
 
         if (key === '/newkb') {
@@ -5825,21 +5858,57 @@
         headBadge.className = 'qbadge review';
         headBadge.textContent = 'Needs review';
         const stageName = runStages[stepIndex][0];
-        approvalSlot.innerHTML = `
-      <div class="approval-box">
-        <div class="a-head"><b>Review: ${stageName}</b></div>
-        <p>Manual review pause required for authorization continuation parameters.</p>
-        <textarea placeholder="Optional parameters...">Validated matrix boundaries.</textarea>
-        <div class="a-actions">
-          <button class="approve" data-act="approve">Approve &amp; Continue</button>
-          <button class="edit" data-act="edit">Save Edit &amp; Continue</button>
-          <button class="skip" data-act="skip">Skip Review</button>
-        </div>
-      </div>`;
-        approvalSlot.querySelectorAll('button').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const act = btn.dataset.act;
-            const tag = document.createElement('span');
+        let bodyHTML = '';
+        const isStoryFlow = (key === '/story');
+        const isPlanFlow = (key === '/plan');
+
+        if (isStoryFlow && stepIndex === 1) {
+          const docs = kbData.retrievedDocs || RETRIEVED_DOCS;
+          bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">Retrieved Documents — Review & deselect any irrelevant sources:</div>' +
+            docs.map((d, idx) => '<label class="approval-doc-row" style="display:flex;gap:8px;align-items:center;padding:5px 0;font-size:11px;border-bottom:1px solid #f0f0f0"><input type="checkbox" checked data-doc-idx="' + idx + '" style="accent-color:var(--orange)" /><span style="flex:1;font-weight:600">' + d.title + '</span><span class="mono" style="color:var(--ink-soft);font-size:10px">WI: ' + d.wi + '</span><span style="color:var(--green);font-size:10px;font-weight:600">' + d.confidence + '</span></label>').join('');
+        } else if (isStoryFlow && stepIndex === 2) {
+          const insights = kbData.insights || [];
+          bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">Extracted Insights — Verify processing accuracy:</div>' +
+            insights.map(function(i) { return '<div style="padding:5px 0;font-size:11px;color:var(--ink-soft);border-bottom:1px solid #f0f0f0">&#8226; ' + i + '</div>'; }).join('') +
+            '<textarea class="approval-edit-input" data-stage="insights" placeholder="Add or modify insights..." style="width:100%;min-height:50px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;margin-top:8px;resize:vertical"></textarea>';
+        } else if (isStoryFlow && stepIndex === 3) {
+          var n = kbData.narrative || {};
+          bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">User Story Narrative — Edit before final assembly:</div>' +
+            '<textarea class="approval-edit-input" data-stage="narrative" style="width:100%;min-height:80px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical;line-height:1.6">As ' + (n.role || 'a User') + ',\nI want ' + (n.want || 'to perform an action') + ',\nSo that ' + (n.so || 'the system processes my request efficiently.') + '</textarea>';
+        } else if (isPlanFlow && stepIndex === 1) {
+          bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">Compliance Parameters — Review before synthesis:</div>' +
+            '<textarea class="approval-edit-input" data-stage="compliance" placeholder="Review compliance parameters..." style="width:100%;min-height:60px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical">All constitutional checks passed for the selected knowledge base scope and role access level.</textarea>';
+        } else if (isPlanFlow && stepIndex === 2) {
+          bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">Database Schema Mapping — Verify entity alignment:</div>' +
+            '<textarea class="approval-edit-input" data-stage="schema" placeholder="Review schema mappings..." style="width:100%;min-height:60px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical">Schema mapping validated against KB entity definitions and field constraints.</textarea>';
+        } else if (isPlanFlow && stepIndex === 3) {
+          bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">Phase Timeline — Review implementation schedule:</div>' +
+            '<textarea class="approval-edit-input" data-stage="timeline" placeholder="Review phase timeline..." style="width:100%;min-height:60px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical">Phase 1: Foundation (Week 1-2) | Phase 2: Core Logic (Week 3-4) | Phase 3: Integration (Week 5-6)</textarea>';
+        } else {
+          bodyHTML = '<div style="font-size:11px;color:var(--ink-soft);margin-bottom:6px"><b>' + stageName + '</b> — Stage ready for review.</div>' +
+            '<textarea class="approval-edit-input" data-stage="general" placeholder="Optional parameters or notes..." style="width:100%;min-height:50px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical">Stage processing completed. Approve to continue or edit parameters before proceeding.</textarea>';
+        }
+
+        approvalSlot.innerHTML = '<div class="approval-box">' +
+          '<div class="a-head"><b>Review: ' + stageName + '</b></div>' +
+          '<div class="a-body" style="margin:8px 0;max-height:200px;overflow-y:auto">' + bodyHTML + '</div>' +
+          '<textarea class="approval-notes" placeholder="Optional review notes..." style="width:100%;min-height:36px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;margin-top:6px;resize:vertical"></textarea>' +
+          '<div class="a-actions">' +
+          '<button class="approve" data-act="approve">Approve &amp; Continue</button>' +
+          '<button class="edit" data-act="edit">Save Edit &amp; Continue</button>' +
+          '<button class="skip" data-act="skip">Skip Review</button>' +
+          '</div></div>';
+
+        approvalSlot.querySelectorAll('button').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var act = btn.dataset.act;
+            if (act === 'edit' && window._activeRunContext) {
+              var notesEl = approvalSlot.querySelector('.approval-notes');
+              var stageInput = approvalSlot.querySelector('.approval-edit-input');
+              if (notesEl) window._activeRunContext.stageEdits[stepIndex] = { notes: notesEl.value };
+              if (stageInput) window._activeRunContext.stageEdits[stepIndex + '_content'] = stageInput.value;
+            }
+            var tag = document.createElement('span');
             tag.className = 'revtag';
             tag.textContent = act.toUpperCase() + 'D';
             steps[stepIndex].appendChild(tag);
