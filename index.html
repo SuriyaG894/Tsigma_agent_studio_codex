@@ -2727,6 +2727,7 @@
       ["/stories-active", "List User Stories in Active Draft", ["ba", "developer", "ba_admin", "dev_admin", "both", "admin"], "read"],
       ["/stories-steering", "List User Stories in Steering Doc", ["ba", "developer", "ba_admin", "dev_admin", "both", "admin"], "read"],
       ["/stories-plan", "List User Stories in Plan Generation", ["ba", "developer", "ba_admin", "dev_admin", "both", "admin"], "read"],
+      ["/stories-completed", "List User Stories in Completed", ["ba", "developer", "ba_admin", "dev_admin", "both", "admin"], "read"],
     ];
 
     const MENTIONS = ["@Claims KB", "@AGS Insurance", "@Fed Payments", "@Auto 360", "@Azure DevOps", "@Jira"];
@@ -2877,6 +2878,11 @@
     const STAGE_LABELS = { 1: "Retrieval", 2: "Insights", 3: "Validation", 4: "Specification" };
     const STAGE_NEXT_COMMAND = { 1: "Generate Insights", 2: "Generate Validation", 3: "Generate Specification" };
 
+    // Stage labels/next-actions for stories in the Completed section, once a Dev / Dev Admin
+    // chooses to keep pushing a completed story forward into Steering Doc (5) / Plan (6).
+    const COMPLETED_STAGE_LABELS = { 4: "Specification", 5: "Steering Doc", 6: "Plan" };
+    const COMPLETED_STAGE_NEXT = { 4: "Generate Steering Doc", 5: "Generate Implementation Plan" };
+
     const USER_STORIES_ACTIVE_DRAFT = [
       { id: 'ud_101', title: 'Submit Insurance Claims', stage: 1, timestamp: '5 min ago', tags: ['#Claims', '#Compliance'], kb: 'Claims Management KB' },
       { id: 'ud_102', title: 'Manage Employee Information', stage: 2, timestamp: '18 min ago', tags: ['#HR', '#Profile'], kb: '@Fed Payments' },
@@ -2894,16 +2900,33 @@
       { id: 'pg_302', title: 'Implementation Plan — Auto 360 Valuation', timestamp: '1 week ago', tags: ['#Auto360', '#Plan'], kb: '@Auto 360' },
     ];
 
+    // Stories that have completed their core lifecycle (Specification fulfilled). BA-type roles can
+    // only review these via the read-only Pipeline Wizard; Dev-type roles can keep advancing them into
+    // Steering Doc / Implementation Plan directly from the chat.
+    const USER_STORIES_COMPLETED = [
+      { id: 'cd_401', title: 'Approve Claims Adjuster Assignment', timestamp: '2 days ago', tags: ['#Claims', '#Workflow'], kb: 'Claims Management KB' },
+      { id: 'cd_402', title: 'Update Policyholder Contact Details', timestamp: '4 days ago', tags: ['#Profile', '#Compliance'], kb: '@AGS Insurance' },
+      { id: 'cd_403', title: 'Process Federal Payment Reconciliation', timestamp: '1 week ago', tags: ['#FederalPayments', '#Reconciliation'], kb: '@Fed Payments' },
+      { id: 'cd_404', title: 'Calculate Auto 360 Trade-In Value', timestamp: '2 weeks ago', tags: ['#Auto360', '#Valuation'], kb: '@Auto 360' },
+    ];
+
     const STORY_SECTIONS = {
       active_draft: { label: 'Active Draft', stories: USER_STORIES_ACTIVE_DRAFT },
       steering_doc: { label: 'Steering Doc', stories: USER_STORIES_STEERING_DOC },
       plan_generation: { label: 'Plan Generation', stories: USER_STORIES_PLAN_GENERATION },
+      completed: { label: 'Completed', stories: USER_STORIES_COMPLETED },
     };
 
     // Live per-story stage state, seeded from the static data above so it can advance during the session.
     window.storyStageState = window.storyStageState || {};
     USER_STORIES_ACTIVE_DRAFT.forEach(s => {
       if (window.storyStageState[s.id] === undefined) window.storyStageState[s.id] = s.stage;
+    });
+
+    // Live per-story stage state for Completed stories, always seeded at Stage 4 (Specification).
+    window.completedStoryStageState = window.completedStoryStageState || {};
+    USER_STORIES_COMPLETED.forEach(s => {
+      if (window.completedStoryStageState[s.id] === undefined) window.completedStoryStageState[s.id] = 4;
     });
 
     const KB_STORY_DATA = {
@@ -3578,6 +3601,7 @@
         case '/stories-active':
         case '/stories-steering':
         case '/stories-plan':
+        case '/stories-completed':
           // Ability to access KB: requires at least explicit 'read' status across profiles
           return ['read', 'write', 'admin'].includes(accessLevel);
 
@@ -3893,6 +3917,11 @@
       '/stories-plan': [
         ["Scanning Plan Generation Bucket", "storyStore.query(status=plan_generation)"],
         ["Formatting Story List", "resultFormatter.build()"]
+      ],
+      '/stories-completed': [
+        ["Scanning Completed Bucket", "storyStore.query(status=completed)"],
+        ["Resolving Lifecycle Stages", "storyStore.resolveStage()"],
+        ["Formatting Story List", "resultFormatter.build()"]
       ]
     };
 
@@ -3990,6 +4019,57 @@
     // Opens a story from a listed section directly in the chat feed as its own run card.
     window.openStoryInChat = function (id, section) {
       feedEmpty.style.display = 'none';
+
+      if (section === 'completed') {
+        const story = USER_STORIES_COMPLETED.find(s => s.id === id);
+        if (!story) return;
+        // Dev / Dev Admin get the Stage-4-pinned inline card with Generate Steering Doc /
+        // Generate Till Implementation Plan actions. Every other role (BA, BA Admin, Full Stack,
+        // Super Admin) gets a read-only summary with an "Open Pipeline Wizard" option that opens
+        // the full modal pointed at Stage 4 (Specification), showing the BA-visible stages 1–4.
+        const isDevOnly = ['developer', 'dev_admin'].includes(currentRole);
+        const bodyInner = isDevOnly
+          ? renderCompletedStoryStageCard(id)
+          : `
+        <div class="result-box">
+          <div class="result-head"><b>${story.title}</b><span class="conf">Completed</span></div>
+          <div class="tag-row">${story.tags.map(t => `<span class="story-tag">${t}</span>`).join('')}</div>
+          <div class="story-preview-card" style="margin:12px 0 0; padding:10px 12px; border-left:4px solid var(--orange); border-radius:8px; background:#FCFDFE; display:flex; align-items:center; justify-content:space-between;">
+            <div class="story-preview-left" style="display:flex; align-items:center; gap:10px;">
+              <div class="doc-icon-badge" style="width:30px; height:30px; font-size:14px; border-radius:6px; background:#FFF0EB; display:flex; align-items:center; justify-content:center;">📄</div>
+              <div class="story-preview-text">
+                <div class="story-preview-title" style="font-size:11px; font-weight:700; color:var(--ink-soft);">Specification complete</div>
+                <div class="story-preview-desc" style="font-size:12.5px; font-weight:600; color:var(--ink);">Review the full Retrieval → Specification lifecycle for this story.</div>
+              </div>
+            </div>
+            <button class="expand-toggle-btn" onclick="openFullStoryWizardModal('${story.kb}', 4, 'story')" style="font-size:11.5px; color:var(--orange); background:transparent; border:none; cursor:pointer; font-weight:600; white-space:nowrap;">Open Pipeline Wizard ↗</button>
+          </div>
+          <div class="ac-block"><b>Timestamp</b><p>${story.timestamp}</p></div>
+        </div>`;
+        const card = document.createElement('div');
+        card.className = 'run-card expanded';
+        card.innerHTML = `
+      <div class="run-card-head">
+        <div class="run-status-dot ok"></div>
+        <div class="qtext">${story.title}</div>
+        <div class="qbadge ok">Opened</div>
+        <div class="chevron">▶</div>
+      </div>
+      <div class="run-card-body">
+        <div class="run-card-inner">${bodyInner}</div>
+      </div>`;
+        feed.insertBefore(card, feed.firstChild);
+        card.querySelector('.run-card-head').addEventListener('click', () => card.classList.toggle('expanded'));
+        ConversationManager.addMessage({
+          id: 'msg_' + Math.random().toString(36).slice(2, 10),
+          conversationId: ConversationManager.activeId,
+          sender: 'agent',
+          content: `Opened ${story.title} · Completed`,
+          attachments: [], toolCalls: [], timestamp: new Date().toISOString(), status: 'completed'
+        });
+        UIManager.renderConversationList();
+        return;
+      }
 
       if (section !== 'active_draft') {
         const sectionData = STORY_SECTIONS[section];
@@ -4092,6 +4172,91 @@
             conversationId: ConversationManager.activeId,
             sender: 'agent',
             content: `${story.title} advanced to Stage ${finalStage} (${STAGE_LABELS[finalStage]})${auto ? ' via Generate Till Specification' : ''}`,
+            attachments: [], toolCalls: [], timestamp: new Date().toISOString(), status: 'completed'
+          });
+          UIManager.renderConversationList();
+        }
+      }
+      runNext();
+    };
+
+    // Renders the inline Stage-4-pinned card shown to Dev / Dev Admin when they open a Completed story.
+    // Unlike the Active Draft card (stages 1→4), this one starts at Stage 4 (Specification, already
+    // fulfilled) and offers to keep pushing the story forward into Steering Doc (5) / Plan (6).
+    function renderCompletedStoryStageCard(id) {
+      const story = USER_STORIES_COMPLETED.find(s => s.id === id);
+      if (!story) return '';
+      const stage = window.completedStoryStageState[id] || 4;
+      const stageLabel = COMPLETED_STAGE_LABELS[stage];
+      let actionsHTML = '';
+      if (stage < 6) {
+        const nextLabel = COMPLETED_STAGE_NEXT[stage];
+        actionsHTML = `
+      <button class="toolbar-btn primary-orange-btn" onclick="advanceCompletedStoryStage('${id}', ${stage + 1}, false)">${nextLabel}</button>
+      <button class="toolbar-btn secondary-btn" onclick="advanceCompletedStoryStage('${id}', 6, true)">⚡ Generate Till Implementation Plan</button>
+    `;
+      } else {
+        actionsHTML = `<span class="status-badge status-completed">All stages fulfilled ✓</span>`;
+      }
+      return `
+    <div class="result-box story-stage-card" id="completedStageCard_${id}">
+      <div class="result-head"><b>${story.title}</b><span class="conf">Stage ${stage} · ${stageLabel}</span></div>
+      <div class="tag-row">${story.tags.map(t => `<span class="story-tag">${t}</span>`).join('')}</div>
+      <div class="story-preview-card" style="margin:0 0 12px; padding:10px 12px; border-left:4px solid var(--orange); border-radius:8px; background:#FCFDFE; display:flex; align-items:center; justify-content:space-between;">
+        <div class="story-preview-left" style="display:flex; align-items:center; gap:10px;">
+          <div class="doc-icon-badge" style="width:30px; height:30px; font-size:14px; border-radius:6px; background:#FFF0EB; display:flex; align-items:center; justify-content:center;">📄</div>
+          <div class="story-preview-text">
+            <div class="story-preview-title" style="font-size:11px; font-weight:700; color:var(--ink-soft);">${stageLabel} output</div>
+            <div class="story-preview-desc" style="font-size:12.5px; font-weight:600; color:var(--ink);">Specification is fulfilled. View it, or continue into Steering Doc / Plan.</div>
+          </div>
+        </div>
+        <button class="expand-toggle-btn" onclick="openFullStoryWizardModal('${story.kb}', ${stage}, '${stage >= 5 ? 'steering' : 'story'}')" style="font-size:11.5px; color:var(--orange); background:transparent; border:none; cursor:pointer; font-weight:600; white-space:nowrap;">Open Pipeline Wizard ↗</button>
+      </div>
+      <div class="story-stage-timeline timeline" id="completedStageTimeline_${id}" style="display:none;"></div>
+      <div class="toolbar-actions" style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+        ${actionsHTML}
+      </div>
+    </div>`;
+    }
+
+    // Advances a Completed story from Stage 4 (Specification) up through Steering Doc (5) / Plan (6).
+    // Mirrors advanceStoryStage's animated-timeline pattern, kept as a separate state map/id-space so it
+    // never collides with the Active Draft (1→4) lifecycle tracked in window.storyStageState.
+    window.advanceCompletedStoryStage = function (id, targetStage, auto) {
+      const story = USER_STORIES_COMPLETED.find(s => s.id === id);
+      if (!story) return;
+      const cardWrap = document.getElementById(`completedStageCard_${id}`);
+      if (!cardWrap) return;
+      const timelineEl = document.getElementById(`completedStageTimeline_${id}`);
+      const actionsEl = cardWrap.querySelector('.toolbar-actions');
+      const startStage = window.completedStoryStageState[id] || 4;
+      const stagesToRun = [];
+      for (let s = startStage + 1; s <= targetStage; s++) stagesToRun.push(s);
+      if (!stagesToRun.length) return;
+
+      actionsEl.style.display = 'none';
+      timelineEl.style.display = 'block';
+      timelineEl.innerHTML = stagesToRun.map(s =>
+        `<div class="step" data-stage="${s}"><div class="dot"></div>Generating ${COMPLETED_STAGE_LABELS[s]}<span class="meta">Stage ${s} · ${COMPLETED_STAGE_LABELS[s]}</span></div>`
+      ).join('');
+      const stepEls = timelineEl.querySelectorAll('.step');
+
+      let idx = 0;
+      function runNext() {
+        if (idx > 0) stepEls[idx - 1].classList.add('done');
+        if (idx < stepEls.length) {
+          stepEls[idx].classList.add('active');
+          window.completedStoryStageState[id] = stagesToRun[idx];
+          idx++;
+          setTimeout(runNext, 700);
+        } else {
+          cardWrap.outerHTML = renderCompletedStoryStageCard(id);
+          const finalStage = window.completedStoryStageState[id];
+          ConversationManager.addMessage({
+            id: 'msg_' + Math.random().toString(36).slice(2, 10),
+            conversationId: ConversationManager.activeId,
+            sender: 'agent',
+            content: `${story.title} advanced to Stage ${finalStage} (${COMPLETED_STAGE_LABELS[finalStage]})${auto ? ' via Generate Till Implementation Plan' : ''}`,
             attachments: [], toolCalls: [], timestamp: new Date().toISOString(), status: 'completed'
           });
           UIManager.renderConversationList();
@@ -5336,6 +5501,7 @@
           case '/stories-active': return renderStoryListResult('active_draft');
           case '/stories-steering': return renderStoryListResult('steering_doc');
           case '/stories-plan': return renderStoryListResult('plan_generation');
+          case '/stories-completed': return renderStoryListResult('completed');
           default: return `
         <div class="result-box">
           <div class="result-head"><b>Result Generated Successfully</b><span class="conf">98% confidence</span></div>
@@ -5574,7 +5740,7 @@
           cancelBtn.addEventListener('click', () => closeFlow('Push flow was cancelled.'));
         }
 
-        if (key === '/stories-active' || key === '/stories-steering' || key === '/stories-plan') {
+        if (key === '/stories-active' || key === '/stories-steering' || key === '/stories-plan' || key === '/stories-completed') {
           handledAsInteractive = true;
           resultSlot.querySelectorAll('[data-open-story-id]').forEach(btn => {
             btn.addEventListener('click', () => {
