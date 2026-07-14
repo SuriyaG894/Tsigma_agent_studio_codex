@@ -180,7 +180,9 @@
     }
 
     .panel-toggle {
-      display: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border: none;
       background: #fff;
       border: 1px solid var(--line);
@@ -190,6 +192,14 @@
       border-radius: 10px;
       cursor: pointer;
       box-shadow: 0 6px 18px rgba(15, 23, 42, .04);
+      font-size: 15px;
+      flex-shrink: 0;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    .panel-toggle:hover {
+      background: var(--orange-tint);
+      color: var(--orange);
     }
 
     /* ================= BODY ================= */
@@ -214,6 +224,22 @@
       flex-direction: column;
       min-width: 0;
       box-shadow: 0 6px 20px rgba(15, 23, 42, .06);
+    }
+
+    @media (min-width: 1181px) {
+      .sidebar {
+        transition: width .22s ease, opacity .18s ease, box-shadow .18s ease;
+        overflow: hidden;
+      }
+
+      .sidebar:not(.open) {
+        width: 0 !important;
+        min-width: 0;
+        opacity: 0;
+        box-shadow: none;
+        border-right: none;
+        pointer-events: none;
+      }
     }
 
     .sidebar-head {
@@ -2481,6 +2507,8 @@
     <!-- ================= HEADER ================= -->
     <div class="header">
       <div class="h-left">
+        <button class="panel-toggle" id="sidebarToggleBtn" title="Toggle conversation history"
+          aria-label="Toggle conversation history">☰</button>
         <div class="brand">
           <div class="mark">Σ</div>Knowledge Base Agent Studio
         </div>
@@ -6168,13 +6196,22 @@
     WorkspaceManager.loadConversation();
 
     document.getElementById('newConversationBtn').addEventListener('click', WorkspaceManager.newConversation);
+    document.getElementById('sidebarToggleBtn').addEventListener('click', () => {
+      const sidebar = document.getElementById('conversationSidebar');
+      setSidebarState(!sidebar.classList.contains('open'));
+    });
     document.getElementById('conversationSearch').addEventListener('input', () => UIManager.renderConversationList());
     document.getElementById('conversationFilters').addEventListener('click', (e) => {
       const btn = e.target.closest('.conv-filter');
       if (!btn) return;
       UIManager.setConversationFilter(btn.dataset.filter);
     });
-    document.getElementById('conversationSidebar').classList.toggle('open', localStorage.getItem(STORAGE_KEYS.sidebarOpen) === '1' || window.innerWidth > 1180);
+    (function initSidebarState() {
+      const stored = localStorage.getItem(STORAGE_KEYS.sidebarOpen);
+      const defaultOpen = window.innerWidth > 1180; // first-time visit: open on desktop, closed on mobile
+      const initialOpen = stored !== null ? stored === '1' : defaultOpen;
+      document.getElementById('conversationSidebar').classList.toggle('open', initialOpen);
+    })();
     document.querySelector('.roster').classList.toggle('open', localStorage.getItem('kb_agent_studio_roster_open') === '1');
     UIManager.setConversationFilter(localStorage.getItem(STORAGE_KEYS.conversationFilter) || 'all');
 
