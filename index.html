@@ -421,6 +421,365 @@
       color: #4F46E5;
     }
 
+    .kb-badge-none {
+      background: #F1F5F9;
+      color: var(--ink-soft);
+    }
+
+    .kb-panel {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: #FAFBFC;
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+
+    .kb-panel.hidden {
+      display: none;
+    }
+
+    .kb-panel-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-right: 4px;
+    }
+
+    .kb-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .kb-dropdown-trigger {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 28px 5px 12px;
+      border-radius: 6px;
+      border: 1.5px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      transition: all .15s ease;
+      user-select: none;
+      white-space: nowrap;
+      max-width: 260px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+      position: relative;
+    }
+
+    .kb-dropdown-trigger:hover {
+      border-color: var(--orange);
+      background: var(--orange-tint);
+    }
+
+    .kb-dropdown-trigger.has-selection {
+      border-color: var(--orange);
+      background: var(--orange-tint);
+    }
+
+    .kb-trigger-chevron {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 9px;
+      transition: transform .15s ease;
+      pointer-events: none;
+      color: var(--ink-soft);
+    }
+
+    .kb-dropdown-trigger.open .kb-trigger-chevron {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .kb-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      min-width: 220px;
+      max-width: 300px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+      z-index: 1000;
+      padding: 4px 0;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .kb-dropdown-menu.open {
+      display: block;
+    }
+
+    .kb-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink);
+      cursor: pointer;
+      transition: background .1s ease;
+      user-select: none;
+    }
+
+    .kb-dropdown-item:hover {
+      background: var(--orange-tint);
+    }
+
+    .kb-dropdown-item input[type="checkbox"] {
+      accent-color: var(--orange);
+      width: 13px;
+      height: 13px;
+      margin: 0;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .kb-dropdown-item.kb-none-item {
+      color: var(--ink-soft);
+      font-style: italic;
+    }
+
+    .kb-dropdown-divider {
+      height: 1px;
+      background: var(--line);
+      margin: 4px 0;
+    }
+
+    .upload-dropzone {
+      border: 2px dashed var(--line);
+      border-radius: 12px;
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .15s ease;
+      background: var(--bg);
+    }
+
+    .upload-dropzone:hover,
+    .upload-dropzone.dragover {
+      border-color: var(--orange);
+      background: var(--orange-tint);
+    }
+
+    .upload-dropzone-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .upload-dropzone-text {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .upload-dropzone-subtext {
+      font-size: 10.5px;
+      color: var(--ink-soft);
+      margin-bottom: 10px;
+    }
+
+    .upload-browse-btn {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1.5px solid var(--orange);
+      background: var(--orange-tint);
+      color: var(--orange);
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+
+    .upload-browse-btn:hover {
+      background: var(--orange);
+      color: #fff;
+    }
+
+    .upload-file-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .upload-file-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 11.5px;
+    }
+
+    .upload-file-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .upload-file-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .upload-file-name {
+      font-weight: 600;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+
+    .upload-file-size {
+      font-size: 10px;
+      color: var(--ink-soft);
+    }
+
+    .remove-file {
+      border: none;
+      background: transparent;
+      color: var(--ink-soft);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px;
+      border-radius: 4px;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: color .1s;
+    }
+
+    .remove-file:hover {
+      color: #DC2626;
+    }
+
+    .upload-validation-msg {
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 500;
+      background: #FEF2F2;
+      color: #DC2626;
+      border: 1px solid #FECACA;
+    }
+
+    .upload-progress-wrap {
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    .upload-progress-track {
+      width: 100%;
+      height: 6px;
+      background: #E5E7EB;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .upload-progress-bar {
+      height: 100%;
+      background: var(--orange);
+      border-radius: 3px;
+      transition: width .3s ease;
+      width: 0%;
+    }
+
+    .upload-progress-text {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .upload-progress-subtext {
+      font-size: 10.5px;
+      color: var(--ink-soft);
+      margin-top: 2px;
+    }
+
+    .upload-confirm-files {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .upload-confirm-file {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: var(--ink);
+    }
+
+    .upload-confirm-file .check-icon {
+      color: #16A34A;
+      font-weight: 700;
+    }
+
+    .upload-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .upload-meta-item {
+      font-size: 11px;
+    }
+
+    .upload-meta-item span {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--ink-soft);
+      margin-bottom: 2px;
+    }
+
+    .upload-meta-item b {
+      color: var(--ink);
+    }
+
+    .conv-preview {
+      font-size: 11px;
+      color: var(--ink-soft);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
+      margin-top: 2px;
+      font-style: italic;
+    }
+
+    .conv-msg-count {
+      font-size: 10px;
+      color: var(--ink-soft);
+      opacity: 0.7;
+    }
+
+    .conv-pin-icon {
+      font-size: 11px;
+      margin-left: 4px;
+    }
+
     .status-badge {
       font-size: 9.5px;
       font-weight: 700;
@@ -656,6 +1015,13 @@
       cursor: pointer;
       font-size: 15px;
       color: var(--ink-soft);
+      transition: all .15s ease;
+    }
+
+    .attach-btn:hover {
+      border-color: var(--orange);
+      background: var(--orange-tint);
+      color: var(--orange);
     }
 
     .cmd-input {
@@ -2498,6 +2864,168 @@
       color: var(--ink-soft);
       margin-left: 8px;
     }
+
+    /* ================= PROVENANCE GRAPH (Fabric-Lineage style) ================= */
+    .prov-graph-wrap {
+      margin-top: 20px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #FBFBFC;
+      overflow: hidden;
+    }
+
+    .prov-graph-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #FFF;
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .prov-graph-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .prov-graph-sub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .prov-graph-body {
+      padding: 18px 16px 20px;
+      overflow-x: auto;
+    }
+
+    .prov-graph-canvas {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 46px;
+      min-width: max-content;
+      padding-bottom: 4px;
+    }
+
+    .prov-graph-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .prov-edge {
+      fill: none;
+      stroke: #C7CCD6;
+      stroke-width: 1.6;
+      transition: stroke .15s ease, stroke-width .15s ease, opacity .15s ease;
+    }
+
+    .prov-edge.active {
+      stroke: var(--orange);
+      stroke-width: 2.4;
+    }
+
+    .prov-edge.dimmed {
+      opacity: .12;
+    }
+
+    .prov-col {
+      display: flex;
+      flex-direction: column;
+      width: 210px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .prov-col-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--ink-soft);
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--line);
+    }
+
+    .prov-col-count {
+      margin-left: auto;
+      background: #EEF0F3;
+      color: var(--ink-soft);
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+
+    .prov-col-nodes {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .prov-node {
+      background: #FFF;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--node-color, var(--blue));
+      border-radius: 8px;
+      padding: 9px 11px;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, opacity .15s ease, border-color .15s ease;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, .03);
+    }
+
+    .prov-node:hover {
+      transform: translateX(2px);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, .08);
+      border-color: var(--node-color, var(--blue));
+    }
+
+    .prov-node.active {
+      box-shadow: 0 4px 14px rgba(228, 87, 46, .18);
+      border-color: var(--orange);
+    }
+
+    .prov-node.dimmed {
+      opacity: .28;
+    }
+
+    .prov-node-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.4;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    .prov-node-meta {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
   </style>
 </head>
 
@@ -2514,13 +3042,7 @@
         </div>
         <span class="version-chip">v1.0.382</span>
         <div class="crumb">
-          <select id="kbSelect">
-            <option value="Claims Management KB">Claims Management KB</option>
-            <option value="@AGS Insurance">AGS Insurance</option>
-            <option value="@Fed Payments">Fed Payments</option>
-            <option value="@Auto 360">Auto 360</option>
-          </select>
-          <span class="sep">/</span> Agent Console
+          <span id="headerConvTitle">Agent Console</span>
         </div>
       </div>
       <div class="h-right">
@@ -2584,6 +3106,10 @@
           <div class="ctx-item">Role: <b id="ctxRole" style="color:var(--ink)">Business Analyst</b></div>
           <div class="ctx-div"></div>
           <div class="ctx-item">KB access: <span class="ctx-badge badge-read" id="ctxKbBadge">READ</span></div>
+        </div>
+
+        <div class="kb-panel" id="kbPanel">
+          <span class="kb-panel-label">Knowledge Base:</span>
         </div>
 
         <div class="composer-wrap">
@@ -2734,9 +3260,9 @@
     // Static initial mapping assignments per item in selection
     const KB_ACCESS_MAPPING = {
       "Claims Management KB": "admin",
-      "@AGS Insurance": "read",
-      "@Fed Payments": "write",
-      "@Auto 360": "read"
+      "AGS Insurance": "read",
+      "Fed Payments": "write",
+      "Auto 360": "read"
     };
 
     const COMMANDS = [
@@ -2913,19 +3439,19 @@
 
     const USER_STORIES_ACTIVE_DRAFT = [
       { id: 'ud_101', title: 'Submit Insurance Claims', stage: 1, timestamp: '5 min ago', tags: ['#Claims', '#Compliance'], kb: 'Claims Management KB' },
-      { id: 'ud_102', title: 'Manage Employee Information', stage: 2, timestamp: '18 min ago', tags: ['#HR', '#Profile'], kb: '@Fed Payments' },
-      { id: 'ud_103', title: 'Handle Policy Renewal', stage: 3, timestamp: 'Yesterday', tags: ['#Renewal', '#Auto'], kb: '@AGS Insurance' },
-      { id: 'ud_104', title: 'Assess Vehicle Value for Policy', stage: 4, timestamp: 'Last Week', tags: ['#Auto360', '#Underwriting'], kb: '@Auto 360' },
+      { id: 'ud_102', title: 'Manage Employee Information', stage: 2, timestamp: '18 min ago', tags: ['#HR', '#Profile'], kb: 'Fed Payments' },
+      { id: 'ud_103', title: 'Handle Policy Renewal', stage: 3, timestamp: 'Yesterday', tags: ['#Renewal', '#Auto'], kb: 'AGS Insurance' },
+      { id: 'ud_104', title: 'Assess Vehicle Value for Policy', stage: 4, timestamp: 'Last Week', tags: ['#Auto360', '#Underwriting'], kb: 'Auto 360' },
     ];
 
     const USER_STORIES_STEERING_DOC = [
       { id: 'sd_201', title: 'Generate Steering Doc — Claims Management', timestamp: 'Last Week', tags: ['#Claims', '#Documentation'], kb: 'Claims Management KB' },
-      { id: 'sd_202', title: 'Generate Steering Doc — Fed Payments', timestamp: '2 Weeks Ago', tags: ['#FederalPayments', '#Planning'], kb: '@Fed Payments' },
+      { id: 'sd_202', title: 'Generate Steering Doc — Fed Payments', timestamp: '2 Weeks Ago', tags: ['#FederalPayments', '#Planning'], kb: 'Fed Payments' },
     ];
 
     const USER_STORIES_PLAN_GENERATION = [
-      { id: 'pg_301', title: 'Implementation Plan — Claims Processing', timestamp: '3 days ago', tags: ['#Claims', '#Plan'], kb: '@AGS Insurance' },
-      { id: 'pg_302', title: 'Implementation Plan — Auto 360 Valuation', timestamp: '1 week ago', tags: ['#Auto360', '#Plan'], kb: '@Auto 360' },
+      { id: 'pg_301', title: 'Implementation Plan — Claims Processing', timestamp: '3 days ago', tags: ['#Claims', '#Plan'], kb: 'AGS Insurance' },
+      { id: 'pg_302', title: 'Implementation Plan — Auto 360 Valuation', timestamp: '1 week ago', tags: ['#Auto360', '#Plan'], kb: 'Auto 360' },
     ];
 
     // Stories that have completed their core lifecycle (Specification fulfilled). BA-type roles can
@@ -2933,9 +3459,9 @@
     // Steering Doc / Implementation Plan directly from the chat.
     const USER_STORIES_COMPLETED = [
       { id: 'cd_401', title: 'Approve Claims Adjuster Assignment', timestamp: '2 days ago', tags: ['#Claims', '#Workflow'], kb: 'Claims Management KB' },
-      { id: 'cd_402', title: 'Update Policyholder Contact Details', timestamp: '4 days ago', tags: ['#Profile', '#Compliance'], kb: '@AGS Insurance' },
-      { id: 'cd_403', title: 'Process Federal Payment Reconciliation', timestamp: '1 week ago', tags: ['#FederalPayments', '#Reconciliation'], kb: '@Fed Payments' },
-      { id: 'cd_404', title: 'Calculate Auto 360 Trade-In Value', timestamp: '2 weeks ago', tags: ['#Auto360', '#Valuation'], kb: '@Auto 360' },
+      { id: 'cd_402', title: 'Update Policyholder Contact Details', timestamp: '4 days ago', tags: ['#Profile', '#Compliance'], kb: 'AGS Insurance' },
+      { id: 'cd_403', title: 'Process Federal Payment Reconciliation', timestamp: '1 week ago', tags: ['#FederalPayments', '#Reconciliation'], kb: 'Fed Payments' },
+      { id: 'cd_404', title: 'Calculate Auto 360 Trade-In Value', timestamp: '2 weeks ago', tags: ['#Auto360', '#Valuation'], kb: 'Auto 360' },
     ];
 
     const STORY_SECTIONS = {
@@ -2998,7 +3524,7 @@
           ]
         }
       },
-      "@AGS Insurance": {
+      "AGS Insurance": {
         title: "Submit Insurance Claims",
         narrative: {
           role: "a Customer",
@@ -3038,7 +3564,7 @@
           ]
         }
       },
-      "@Fed Payments": {
+      "Fed Payments": {
         title: "View and Manage Fed Payments",
         narrative: {
           role: "an Accountant",
@@ -3076,7 +3602,7 @@
           ]
         }
       },
-      "@Auto 360": {
+      "Auto 360": {
         title: "Assess Vehicle Value for Policy",
         narrative: {
           role: "an Underwriter",
@@ -3401,22 +3927,22 @@
     };
 
     function getSteeringData(kbName) {
-      if (kbName === "Claims Management KB" || kbName === "@AGS Insurance") {
+      if (kbName === "Claims Management KB" || kbName === "AGS Insurance") {
         return CLAIMS_STEERING;
-      } else if (kbName === "@Fed Payments") {
+      } else if (kbName === "Fed Payments") {
         return FED_STEERING;
-      } else if (kbName === "@Auto 360") {
+      } else if (kbName === "Auto 360") {
         return AUTO_STEERING;
       }
       return EMPLOYEE_STEERING;
     }
 
     function getPlanData(kbName) {
-      if (kbName === "Claims Management KB" || kbName === "@AGS Insurance") {
+      if (kbName === "Claims Management KB" || kbName === "AGS Insurance") {
         return CLAIMS_PLAN;
-      } else if (kbName === "@Fed Payments") {
+      } else if (kbName === "Fed Payments") {
         return FED_PLAN;
-      } else if (kbName === "@Auto 360") {
+      } else if (kbName === "Auto 360") {
         return AUTO_PLAN;
       }
       return EMPLOYEE_PLAN;
@@ -3476,7 +4002,7 @@
           "The claims submission feature must meet a 99.9% uptime SLA"
         ]
       },
-      "@AGS Insurance": {
+      "AGS Insurance": {
         "Related Implementations": [
           "[ID: 17068] Submit Insurance Claim",
           "[ID: 17128] Submit and Track Insurance Claims",
@@ -3528,7 +4054,7 @@
           "The claims submission feature must meet a 99.9% uptime SLA"
         ]
       },
-      "@Fed Payments": {
+      "Fed Payments": {
         "Related Implementations": [
           "[ID: 17024] Federal Payments Verification Procedures",
           "[ID: 17112] Fedwire API Endpoints and Mappings",
@@ -3571,7 +4097,7 @@
           "Routing details must mask in client-side UIs and error stacks."
         ]
       },
-      "@Auto 360": {
+      "Auto 360": {
         "Related Implementations": [
           "[ID: 18021] Auto 360 Vehicle Appraisal Guidelines",
           "[ID: 18105] Valuation API Integration Specifications"
@@ -3743,16 +4269,53 @@
   `).join('');
     }
 
-    function syncKbAccessFromSelection(selectedKb) {
-      const mappedAccess = KB_ACCESS_MAPPING[selectedKb] || "read";
-      currentKbAccess = mappedAccess;
+    const ACCESS_LEVEL_ORDER = { "read": 1, "write": 2, "admin": 3 };
+
+    function syncKbAccessFromSelection(selectedKbs) {
+      if (!Array.isArray(selectedKbs)) {
+        selectedKbs = selectedKbs ? [selectedKbs] : [];
+      }
+      if (selectedKbs.length === 0) {
+        currentKbAccess = "read";
+        return;
+      }
+      let lowestLevel = Infinity;
+      let lowestName = "read";
+      for (const kb of selectedKbs) {
+        const level = ACCESS_LEVEL_ORDER[KB_ACCESS_MAPPING[kb]] || 1;
+        if (level < lowestLevel) {
+          lowestLevel = level;
+          lowestName = KB_ACCESS_MAPPING[kb] || "read";
+        }
+      }
+      currentKbAccess = lowestName;
+    }
+
+    function syncKbAccessFromActiveConversation() {
+      const kbs = getActiveKbs();
+      if (kbs.length > 0) {
+        syncKbAccessFromSelection(kbs);
+      } else {
+        currentKbAccess = "read";
+      }
     }
 
     function renderKbSnapshot() {
       const el = document.getElementById('kbSnapshot');
-      const kb = KB_LIBRARY["AGS Insurance"];
+      const selectedKb = getActiveKb() || 'AGS Insurance';
+      const kb = KB_LIBRARY[selectedKb];
+      if (!kb) {
+        el.innerHTML = `<div class="ks-head"><b>${selectedKb}</b><span class="ks-cov">N/A</span></div>
+    <div class="ks-folder"><span>No library data available</span></div>
+    <div class="ks-stats">
+      <div class="ks-stat"><b>${STORY_STATS.activeDraft}</b><span>Active Draft</span></div>
+      <div class="ks-stat"><b>${STORY_STATS.completed}</b><span>Completed</span></div>
+      <div class="ks-stat"><b>${STORY_STATS.steeringPlans}</b><span>Steering &amp; Plans</span></div>
+    </div>`;
+        return;
+      }
       el.innerHTML = `
-    <div class="ks-head"><b>AGS Insurance</b><span class="ks-cov">${kb.coverage}% coverage</span></div>
+    <div class="ks-head"><b>${selectedKb}</b><span class="ks-cov">${kb.coverage}% coverage</span></div>
     ${kb.folders.map(f => `<div class="ks-folder"><span>${f.name}</span><b>${f.count}</b></div>`).join('')}
     <div class="ks-folder"><span>${kb.standalone.name}</span><b>${kb.standalone.count}</b></div>
     <div class="ks-stats">
@@ -3777,10 +4340,6 @@
     }
 
     /* ================= HANDLERS ================= */
-    document.getElementById('kbSelect').addEventListener('change', (e) => {
-      syncKbAccessFromSelection(e.target.value);
-      renderAll();
-    });
     document.getElementById('roleSelect').addEventListener('change', (e) => {
       currentRole = e.target.value;
       renderAll();
@@ -3994,20 +4553,22 @@
     function renderStoryListResult(sectionKey) {
       const section = STORY_SECTIONS[sectionKey];
       const isActiveDraft = sectionKey === 'active_draft';
-      const currentKb = document.getElementById('kbSelect').value;
-      const stories = section.stories.filter(s => s.kb === currentKb);
+      const activeKbs = getActiveKbs();
+      const stories = section.stories.filter(s => activeKbs.length === 0 || activeKbs.includes(s.kb));
 
       if (!stories.length) {
+        const kbLabel = activeKbs.length ? activeKbs.join(', ') : 'all KBs';
         return `
       <div class="result-box">
-        <div class="result-head"><b>User Stories · ${section.label}</b><span class="conf">${currentKb}</span></div>
-        <div class="ac-block"><b>No Stories Found</b><p>There are no user stories in ${section.label} for <b>${currentKb}</b>. Switch the KB in the header to view its stories.</p></div>
+        <div class="result-head"><b>User Stories · ${section.label}</b><span class="conf">${kbLabel}</span></div>
+        <div class="ac-block"><b>No Stories Found</b><p>There are no user stories in ${section.label} for <b>${kbLabel}</b>. Select a different KB in the panel above to view its stories.</p></div>
       </div>`;
       }
 
+      const kbLabel = activeKbs.length ? activeKbs.join(', ') : 'all KBs';
       return `
     <div class="result-box">
-      <div class="result-head"><b>User Stories · ${section.label}</b><span class="conf">${currentKb} · ${stories.length} ${stories.length === 1 ? 'story' : 'stories'}</span></div>
+      <div class="result-head"><b>User Stories · ${section.label}</b><span class="conf">${kbLabel} · ${stories.length} ${stories.length === 1 ? 'story' : 'stories'}</span></div>
       <div class="doc-list" style="display:flex;flex-direction:column;gap:8px;">
         ${stories.map(s => {
         const stage = isActiveDraft ? (window.storyStageState[s.id] || s.stage) : null;
@@ -4312,19 +4873,134 @@
       runNext();
     };
 
+    function showNewKbForm(resultSlot, queryText) {
+      const kbName = (queryText.replace(/^\/newkb\s*/i, '').trim());
+      const inlineName = kbName ? kbName : '';
+      resultSlot.innerHTML = `
+      <div class="modal-result">
+        <div class="modal-head">
+          <div>
+            <b>Create Knowledge Base</b>
+            <p>${inlineName ? 'Confirm details below to create the new KB.' : 'Enter the KB name and description to create a new Knowledge Base.'}</p>
+          </div>
+          <span class="conf">New KB</span>
+        </div>
+        <div class="modal-body">
+          <div class="field-grid">
+            <div class="full">
+              <label for="newKbNameInput">KB Name</label>
+              <input id="newKbNameInput" type="text" value="${inlineName}" placeholder="Enter KB name">
+            </div>
+            <div class="full">
+              <label for="newKbDescInput">Description</label>
+              <textarea id="newKbDescInput" placeholder="Describe the purpose, audience, or scope of the KB"></textarea>
+            </div>
+            <div class="full">
+              <label>Creation Mode</label>
+              <div class="ac-block" style="margin:0;"><p>Choose a descriptive name, add a brief summary, then create the KB.</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="primary" data-kb-action="create">Create KB</button>
+          <button class="secondary" data-kb-action="cancel">Cancel</button>
+        </div>
+      </div>`;
+
+      const createBtn = resultSlot.querySelector('[data-kb-action="create"]');
+      const cancelBtn = resultSlot.querySelector('[data-kb-action="cancel"]');
+      const nameInput = resultSlot.querySelector('#newKbNameInput');
+      const descInput = resultSlot.querySelector('#newKbDescInput');
+      const addValidation = (message) => {
+        let note = resultSlot.querySelector('.validation-note');
+        if (!note) {
+          note = document.createElement('div');
+          note.className = 'validation-note';
+          note.style.cssText = 'margin:10px 16px 0;padding:8px 10px;border-radius:10px;background:#FFF7ED;color:var(--orange-hover);font-size:11.5px;border:1px solid #FED7AA;';
+          resultSlot.querySelector('.modal-body').appendChild(note);
+        }
+        note.textContent = message;
+      };
+      const closeFlow = (message) => {
+        resultSlot.innerHTML = `
+      <div class="modal-result">
+        <div class="modal-head">
+          <div>
+            <b>Create Knowledge Base</b>
+            <p>${message}</p>
+          </div>
+          <span class="conf">Closed</span>
+        </div>
+        <div class="modal-body">
+          <div class="ac-block"><b>Status</b><p>KB creation flow was cancelled.</p></div>
+        </div>
+      </div>`;
+      };
+      createBtn.addEventListener('click', () => {
+        const name = nameInput.value.trim();
+        const desc = descInput.value.trim();
+        if (!name) {
+          addValidation('KB name is required.');
+          nameInput.focus();
+          return;
+        }
+        if (!desc) {
+          addValidation('Description is recommended before creating a KB.');
+          descInput.focus();
+          return;
+        }
+        const activeConv = ConversationManager.active;
+        if (activeConv) {
+          activeConv.knowledgeBases = [name];
+          activeConv.updatedDate = new Date().toISOString();
+        }
+        ConversationManager.save();
+        syncKbAccessFromActiveConversation();
+        resultSlot.innerHTML = `
+      <div class="modal-result">
+        <div class="modal-head">
+          <div>
+            <b>Knowledge Base Created</b>
+            <p>${name} has been created successfully and added to this conversation.</p>
+          </div>
+          <span class="conf">Created</span>
+        </div>
+        <div class="modal-body">
+          <div class="metrics">
+            <div><b>${name}</b>KB name</div>
+            <div><b>${desc || 'No description'}</b>Description</div>
+          </div>
+        </div>
+      </div>`;
+        UIManager.renderConversationList();
+        KbPanel.render();
+      });
+      cancelBtn.addEventListener('click', () => closeFlow('KB creation was cancelled.'));
+      [nameInput, descInput].forEach(el => el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          createBtn.click();
+        }
+        if (e.key === 'Escape') {
+          closeFlow('KB creation was cancelled.');
+        }
+      }));
+    }
+
     function startRun(queryText) {
       const cmd = resolveCommand(queryText);
       const key = cmd ? cmd[0] : null;
       const runStages = COMMAND_STAGES[key] || FULL_STAGES;
       const blocked = cmd ? !commandAllowed(cmd) : false;
       const mode = currentMode();
-      const selectedKb = document.getElementById('kbSelect').value;
+      const selectedKb = getActiveKb() || 'Claims Management KB';
       const kbData = KB_STORY_DATA[selectedKb] || KB_STORY_DATA["Claims Management KB"];
       const runContext = { kb: selectedKb, kbData, stageEdits: {} };
       window._activeRunContext = runContext;
       const activeConv = ConversationManager.active;
       if (activeConv && activeConv.title === 'New Conversation') {
         activeConv.title = queryText.slice(0, 42);
+        WorkspaceManager.updateHeaderTitle();
       }
       ConversationManager.addMessage({
         id: 'msg_' + Math.random().toString(36).slice(2, 10),
@@ -4523,7 +5199,7 @@
       }
 
       function renderSearchSummary() {
-        const kb = document.getElementById('kbSelect').value;
+        const kb = getActiveKb() || 'Claims Management KB';
         const q = (queryText.replace(/^\/search\s*/i, '').trim() || cmd?.[1] || 'current KB context');
         const docs = kbData.retrievedDocs || RETRIEVED_DOCS;
         return `
@@ -4543,7 +5219,7 @@
       }
 
       function renderUploadSummary() {
-        const kb = document.getElementById('kbSelect').value;
+        const kb = getActiveKb() || 'Claims Management KB';
         return `
       <div class="modal-result">
         <div class="modal-head">
@@ -4569,7 +5245,7 @@
       }
 
       function renderImportSummary() {
-        const kb = document.getElementById('kbSelect').value;
+        const kb = getActiveKb() || 'Claims Management KB';
         return `
       <div class="modal-result">
         <div class="modal-head">
@@ -4646,7 +5322,7 @@
       <div class="result-box">
         <div class="result-head"><b>Delete Action Applied</b><span class="conf">Review required</span></div>
         <div class="metrics">
-          <div><b>${document.getElementById('kbSelect').value}</b>Scope</div>
+          <div><b>${getActiveKb() || 'All KBs'}</b>Scope</div>
           <div><b>${currentRole.toUpperCase()}</b>Role</div>
         </div>
         <div class="ac-block"><b>Scope</b><p>The targeted document or DevOps item has been removed from the current workflow state and its downstream status reset.</p></div>
@@ -4777,7 +5453,7 @@
       };
 
       window.openFullStoryWizardModal = function (kbName, stageNum, flowType) {
-        const kb = kbName || document.getElementById('kbSelect').value;
+        const kb = kbName || getActiveKb() || 'Claims Management KB';
         const isDevOnly = ['developer', 'dev_admin'].includes(currentRole);
 
         let activeStage = stageNum || (flowType === 'steering' ? 5 : (isDevOnly ? 4 : 4));
@@ -4935,6 +5611,232 @@
       };
 
       window.isWizardEditing = false;
+
+      /* ================= PROVENANCE GRAPH — Document → Insight → Gap → Acceptance Criteria → NFR / Plan Task ================= */
+      // Builds a Fabric-Lineage-style column graph out of the same per-KB data already powering
+      // stages 1-6 (RETRIEVED_DOCS / insights / GAP_ANALYSIS / acceptanceCriteria / nfr / steering / plan).
+      // Only rendered from Stage 4 (Specification) onward; extends one extra column per later stage.
+
+      function provEscape(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function provTruncate(str, max) {
+        const s = String(str || '').replace(/\s+/g, ' ').trim();
+        return s.length > max ? s.slice(0, max - 1) + '…' : s;
+      }
+
+      // Deterministic bipartite linker: guarantees every node on both sides has at least
+      // one edge, without requiring any semantic relationship in the underlying mock data.
+      function provBuildLinks(fromCount, toCount) {
+        const edges = [];
+        if (!fromCount || !toCount) return edges;
+        const span = Math.max(fromCount, toCount);
+        const seen = new Set();
+        for (let i = 0; i < span; i++) {
+          const f = i % fromCount;
+          const t = i % toCount;
+          const key = f + '_' + t;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          edges.push([f, t]);
+        }
+        return edges;
+      }
+
+      function provGetFlatInsights(kb, data) {
+        if (data.insights && data.insights.length) return data.insights;
+        const categorized = KB_INSIGHTS[kb] || KB_INSIGHTS["Claims Management KB"];
+        return Object.values(categorized).reduce((acc, arr) => acc.concat(arr), []);
+      }
+
+      window.buildProvenanceModel = function (kb, data, stage) {
+        const docs = data.retrievedDocs || RETRIEVED_DOCS;
+        const insights = provGetFlatInsights(kb, data);
+        const gaps = data.gaps || GAP_ANALYSIS;
+        const acs = (data.specs && data.specs.acceptanceCriteria) || [];
+        const nfrs = (data.specs && data.specs.nfr) || [];
+
+        const nodes = [];
+        const edges = [];
+        const cols = [
+          { key: 'document', label: 'Document', icon: '📄' },
+          { key: 'insight', label: 'Insight', icon: '💡' },
+          { key: 'gap', label: 'Gap', icon: '⚠️' },
+          { key: 'ac', label: 'Acceptance Criteria', icon: '✅' },
+          { key: 'nfr', label: 'NFR', icon: '🛡️' },
+        ];
+
+        docs.forEach((d, i) => nodes.push({ id: `doc${i}`, col: 'document', label: d.title, meta: `WI ${d.wi}`, color: 'var(--blue)' }));
+        insights.forEach((ins, i) => nodes.push({ id: `ins${i}`, col: 'insight', label: provTruncate(ins, 90), meta: 'Insight', color: 'var(--purple)' }));
+        gaps.forEach((g, i) => nodes.push({ id: `gap${i}`, col: 'gap', label: g.gap, meta: g.priority, color: (g.priority || '').toLowerCase() === 'critical' ? 'var(--red)' : 'var(--amber)' }));
+        acs.forEach((ac, i) => nodes.push({ id: `ac${i}`, col: 'ac', label: `${ac.id} · ${ac.title}`, meta: 'Acceptance Criteria', color: 'var(--green)' }));
+        nfrs.forEach((n, i) => nodes.push({ id: `nfr${i}`, col: 'nfr', label: n.label, meta: provTruncate(n.detail, 60), color: 'var(--orange)' }));
+
+        provBuildLinks(docs.length, insights.length).forEach(([f, t]) => edges.push([`doc${f}`, `ins${t}`]));
+        provBuildLinks(insights.length, gaps.length).forEach(([f, t]) => edges.push([`ins${f}`, `gap${t}`]));
+        provBuildLinks(gaps.length, acs.length).forEach(([f, t]) => edges.push([`gap${f}`, `ac${t}`]));
+        provBuildLinks(acs.length, nfrs.length).forEach(([f, t]) => edges.push([`ac${f}`, `nfr${t}`]));
+
+        let steerCount = 0;
+        if (stage >= 5) {
+          const steering = getSteeringData(kb);
+          const steerNodes = [
+            { label: steering.systemComponent?.name || 'System Component', meta: 'Component' },
+            { label: `Data Entities (${(steering.dataEntities || []).length})`, meta: 'Schema' },
+            { label: `API Endpoints (${(steering.apiEndpoints || []).length})`, meta: 'Interface' },
+            { label: steering.functionalReq?.title || 'Functional Requirement', meta: 'Functional' },
+            { label: 'Security Requirements', meta: 'Security' },
+          ];
+          steerCount = steerNodes.length;
+          steerNodes.forEach((s, i) => nodes.push({ id: `steer${i}`, col: 'steering', label: s.label, meta: s.meta, color: 'var(--blue)' }));
+
+          const acNfrTotal = acs.length + nfrs.length;
+          provBuildLinks(acNfrTotal, steerCount).forEach(([f, t]) => {
+            const fromId = f < acs.length ? `ac${f}` : `nfr${f - acs.length}`;
+            edges.push([fromId, `steer${t}`]);
+          });
+          cols.push({ key: 'steering', label: 'Steering Doc', icon: '📘' });
+        }
+
+        if (stage >= 6) {
+          const plan = getPlanData(kb);
+          const phases = plan.phases || [];
+          phases.forEach((ph, i) => nodes.push({ id: `plan${i}`, col: 'plan', label: ph.name, meta: ph.tag || 'Plan Task', color: 'var(--green)' }));
+          provBuildLinks(steerCount || 1, phases.length).forEach(([f, t]) => {
+            const fromId = steerCount ? `steer${f}` : null;
+            if (fromId) edges.push([fromId, `plan${t}`]);
+          });
+          cols.push({ key: 'plan', label: 'Plan Task', icon: '🛠️' });
+        }
+
+        return { cols, nodes, edges };
+      };
+
+      window.renderProvenanceGraph = function (kb, data, stage) {
+        const model = window.buildProvenanceModel(kb, data, stage);
+        window.provenanceModel = model;
+
+        const colsHTML = model.cols.map(c => {
+          const colNodes = model.nodes.filter(n => n.col === c.key);
+          if (!colNodes.length) return '';
+          return `
+        <div class="prov-col" data-col="${c.key}">
+          <div class="prov-col-head">${c.icon} <span>${provEscape(c.label)}</span><span class="prov-col-count">${colNodes.length}</span></div>
+          <div class="prov-col-nodes">
+            ${colNodes.map(n => `
+              <div class="prov-node" id="provNode_${n.id}" data-node-id="${n.id}" style="--node-color:${n.color}" onclick="highlightProvenanceNode('${n.id}')" title="Click to trace lineage">
+                <div class="prov-node-title">${provEscape(n.label)}</div>
+                ${n.meta ? `<div class="prov-node-meta">${provEscape(n.meta)}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+        }).join('');
+
+        const chain = ['Document', 'Insight', 'Gap', 'Acceptance Criteria', 'NFR']
+          .concat(stage >= 5 ? ['Steering Doc'] : [])
+          .concat(stage >= 6 ? ['Plan Task'] : [])
+          .join(' → ');
+
+        return `
+      <div class="prov-graph-wrap" id="provGraphWrap">
+        <div class="prov-graph-header">
+          <div class="prov-graph-title">🔗 Provenance Lineage <span class="prov-graph-sub">${chain}</span></div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="toolbar-btn secondary-btn" style="padding:4px 10px; font-size:11px;" onclick="clearProvenanceHighlight()">Reset</button>
+            <button class="toolbar-btn secondary-btn" style="padding:4px 10px; font-size:11px;" id="provGraphToggleBtn" onclick="toggleProvenanceGraph()">Collapse ▲</button>
+          </div>
+        </div>
+        <div class="prov-graph-body" id="provGraphBody">
+          <div class="prov-graph-canvas" id="provGraphCanvas">
+            <svg class="prov-graph-svg" id="provGraphSvg"></svg>
+            ${colsHTML}
+          </div>
+        </div>
+      </div>`;
+      };
+
+      window.drawProvenanceEdges = function () {
+        const canvas = document.getElementById('provGraphCanvas');
+        const svg = document.getElementById('provGraphSvg');
+        if (!canvas || !svg || !window.provenanceModel) return;
+        const canvasRect = canvas.getBoundingClientRect();
+        svg.setAttribute('width', canvas.scrollWidth);
+        svg.setAttribute('height', canvas.scrollHeight);
+        svg.innerHTML = '';
+
+        window.provenanceModel.edges.forEach(([fromId, toId], idx) => {
+          const fromEl = document.getElementById('provNode_' + fromId);
+          const toEl = document.getElementById('provNode_' + toId);
+          if (!fromEl || !toEl) return;
+          const fr = fromEl.getBoundingClientRect();
+          const tr = toEl.getBoundingClientRect();
+          const x1 = fr.right - canvasRect.left;
+          const y1 = fr.top + fr.height / 2 - canvasRect.top;
+          const x2 = tr.left - canvasRect.left;
+          const y2 = tr.top + tr.height / 2 - canvasRect.top;
+          const dx = Math.max(24, (x2 - x1) / 2);
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('d', `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`);
+          path.setAttribute('class', 'prov-edge');
+          path.setAttribute('data-idx', idx);
+          svg.appendChild(path);
+        });
+      };
+
+      window.highlightProvenanceNode = function (nodeId) {
+        if (window.provActiveNode === nodeId) { window.clearProvenanceHighlight(); return; }
+        window.provActiveNode = nodeId;
+        const edges = (window.provenanceModel && window.provenanceModel.edges) || [];
+        const related = new Set([nodeId]);
+        const relatedEdges = new Set();
+        let changed = true;
+        while (changed) {
+          changed = false;
+          edges.forEach(([f, t], i) => {
+            if (related.has(f) || related.has(t)) {
+              if (!related.has(f)) { related.add(f); changed = true; }
+              if (!related.has(t)) { related.add(t); changed = true; }
+              relatedEdges.add(i);
+            }
+          });
+        }
+        document.querySelectorAll('.prov-node').forEach(el => {
+          const isRelated = related.has(el.dataset.nodeId);
+          el.classList.toggle('active', isRelated);
+          el.classList.toggle('dimmed', !isRelated);
+        });
+        document.querySelectorAll('.prov-edge').forEach(el => {
+          const isRelated = relatedEdges.has(Number(el.dataset.idx));
+          el.classList.toggle('active', isRelated);
+          el.classList.toggle('dimmed', !isRelated);
+        });
+      };
+
+      window.clearProvenanceHighlight = function () {
+        window.provActiveNode = null;
+        document.querySelectorAll('.prov-node').forEach(el => el.classList.remove('active', 'dimmed'));
+        document.querySelectorAll('.prov-edge').forEach(el => el.classList.remove('active', 'dimmed'));
+      };
+
+      window.toggleProvenanceGraph = function () {
+        const body = document.getElementById('provGraphBody');
+        const btn = document.getElementById('provGraphToggleBtn');
+        if (!body || !btn) return;
+        const collapsed = body.style.display === 'none';
+        body.style.display = collapsed ? 'block' : 'none';
+        btn.textContent = collapsed ? 'Collapse ▲' : 'Expand ▼';
+        if (collapsed) requestAnimationFrame(window.drawProvenanceEdges);
+      };
+
+      if (!window.provResizeBound) {
+        window.provResizeBound = true;
+        window.addEventListener('resize', () => {
+          if (document.getElementById('provGraphCanvas')) window.drawProvenanceEdges();
+        });
+      }
 
       window.renderModalWizardContent = function () {
         const kb = window.activeModalKb;
@@ -5235,6 +6137,7 @@
             </div>
           `).join('') : ''}
         </div>
+        ${window.renderProvenanceGraph(kb, data, 4)}
       `;
         } else if (activeStage === 5) {
           if (isSteeringDeleted) {
@@ -5370,6 +6273,7 @@
               </div>
             </div>
           </div>
+        ${window.renderProvenanceGraph(kb, data, 5)}
         `;
           }
         } else if (activeStage === 6) {
@@ -5482,15 +6386,19 @@
               </div>
             </div>
           </div>
+        ${window.renderProvenanceGraph(kb, data, 6)}
         `;
           }
         }
 
         document.getElementById('wizardStageBody').innerHTML = bodyHTML;
+        if (activeStage >= 4 && document.getElementById('provGraphCanvas')) {
+          requestAnimationFrame(window.drawProvenanceEdges);
+        }
       };
 
       window.renderStoryWizardCard = function (kbName, activeStage, runId, flowType) {
-        const kb = kbName || document.getElementById('kbSelect').value;
+        const kb = kbName || getActiveKb() || 'Claims Management KB';
         const data = KB_STORY_DATA[kb] || KB_STORY_DATA["Claims Management KB"];
         const flow = flowType || (activeStage >= 5 ? 'steering' : 'story');
 
@@ -5594,107 +6502,35 @@
 
         if (key === '/newkb') {
           handledAsInteractive = true;
-          const createBtn = resultSlot.querySelector('[data-kb-action="create"]');
-          const cancelBtn = resultSlot.querySelector('[data-kb-action="cancel"]');
-          const nameInput = resultSlot.querySelector('#newKbNameInput');
-          const descInput = resultSlot.querySelector('#newKbDescInput');
-          const addValidation = (message) => {
-            let note = resultSlot.querySelector('.validation-note');
-            if (!note) {
-              note = document.createElement('div');
-              note.className = 'validation-note';
-              note.style.cssText = 'margin:10px 16px 0;padding:8px 10px;border-radius:10px;background:#FFF7ED;color:var(--orange-hover);font-size:11.5px;border:1px solid #FED7AA;';
-              resultSlot.querySelector('.modal-body').appendChild(note);
-            }
-            note.textContent = message;
-          };
-          const closeFlow = (message) => {
-            resultSlot.innerHTML = `
-          <div class="modal-result">
-            <div class="modal-head">
-              <div>
-                <b>Create Knowledge Base</b>
-                <p>${message}</p>
-              </div>
-              <span class="conf">Closed</span>
-            </div>
-            <div class="modal-body">
-              <div class="ac-block"><b>Status</b><p>KB creation flow was cancelled.</p></div>
-            </div>
-          </div>`;
-          };
-          createBtn.addEventListener('click', () => {
-            const name = nameInput.value.trim();
-            const desc = descInput.value.trim();
-            if (!name) {
-              addValidation('KB name is required.');
-              nameInput.focus();
-              return;
-            }
-            if (!desc) {
-              addValidation('Description is recommended before creating a KB.');
-              descInput.focus();
-              return;
-            }
-            const kbConversation = {
-              id: 'conv_' + Math.random().toString(36).slice(2, 10),
-              title: name,
-              knowledgeBase: name,
-              role: currentRole,
-              createdDate: new Date().toISOString(),
-              updatedDate: new Date().toISOString(),
-              status: 'completed',
-              isPinned: false,
-              isArchived: false,
-              tags: ['new-kb'],
-              messages: [
-                {
-                  id: 'msg_' + Math.random().toString(36).slice(2, 10),
-                  conversationId: null,
-                  sender: 'agent',
-                  content: `Knowledge Base "${name}" created${desc ? ` with description: ${desc}` : ''}.`,
-                  attachments: [],
-                  toolCalls: [],
-                  timestamp: new Date().toISOString(),
-                  status: 'completed'
-                }
-              ]
-            };
-            kbConversation.messages[0].conversationId = kbConversation.id;
-            ConversationManager.state.unshift(kbConversation);
-            ConversationManager.activeId = kbConversation.id;
-            ConversationManager.save();
-            resultSlot.innerHTML = `
-          <div class="modal-result">
-            <div class="modal-head">
-              <div>
-                <b>Knowledge Base Created</b>
-                <p>${name} has been created successfully.</p>
-              </div>
-              <span class="conf">Created</span>
-            </div>
-            <div class="modal-body">
-              <div class="metrics">
-                <div><b>${name}</b>KB name</div>
-                <div><b>${desc || 'No description'}</b>Description</div>
-              </div>
-            </div>
-            <div class="modal-actions">
-              <button class="primary">Open KB</button>
-            </div>
-          </div>`;
-            UIManager.renderConversationList();
-          });
-          cancelBtn.addEventListener('click', () => closeFlow('KB creation was cancelled.'));
-          [nameInput, descInput].forEach(el => el.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-              e.preventDefault();
-              createBtn.click();
-            }
-            if (e.key === 'Escape') {
-              closeFlow('KB creation was cancelled.');
-            }
-          }));
+          const activeConv = ConversationManager.active;
+          const currentKbs = activeConv ? (activeConv.knowledgeBases || []) : [];
+
+          if (currentKbs.length > 0) {
+            showKbRemovalConfirm(currentKbs).then(confirmed => {
+              if (!confirmed) {
+                resultSlot.innerHTML = `
+              <div class="modal-result">
+                <div class="modal-head">
+                  <div>
+                    <b>Create Knowledge Base</b>
+                    <p>KB creation was cancelled. Selected KBs remain in this conversation.</p>
+                  </div>
+                  <span class="conf">Cancelled</span>
+                </div>
+                <div class="modal-body">
+                  <div class="ac-block"><b>Status</b><p>No changes were made.</p></div>
+                </div>
+              </div>`;
+                return;
+              }
+              activeConv.knowledgeBases = [];
+              ConversationManager.save();
+              syncKbAccessFromActiveConversation();
+              showNewKbForm(resultSlot, queryText);
+            });
+          } else {
+            showNewKbForm(resultSlot, queryText);
+          }
         }
 
         if (key === '/push') {
@@ -5973,6 +6809,54 @@
       conversationFilter: 'kb_agent_studio_conversation_filter'
     };
 
+    const AVAILABLE_KBS = ['Claims Management KB', 'AGS Insurance', 'Fed Payments', 'Auto 360'];
+
+    const KB_TOPICS = {
+      'Claims Management KB': {
+        topics: {
+          'First Notice of Loss': ['Auto Accident', 'Property Damage', 'Injury Claim', 'Weather Event'],
+          'Claims Investigation': ['Witness Statements', 'Police Reports', 'Medical Records', 'Photos & Evidence'],
+          'Settlement & Reserves': ['Medical Payments', 'Property Repair', 'Legal Reserve', 'Subrogation'],
+          'Compliance & Audit': ['Regulatory Filing', 'Audit Trail', 'Policy Compliance', 'Data Retention']
+        }
+      },
+      'AGS Insurance': {
+        topics: {
+          'Policy Documents': ['Policy Bundles', 'Endorsements', 'Renewal Notices', 'Cancellation Letters'],
+          'Coverage Analysis': ['Risk Assessment', 'Liability Review', 'Property Coverage', 'Umbrella Policies'],
+          'Customer Onboarding': ['Application Forms', 'ID Verification', 'Credit Checks', 'Welcome Packages'],
+          'Claims Processing': ['Damage Estimates', 'Repair Invoices', 'Settlement Offers', 'Denial Letters']
+        }
+      },
+      'Fed Payments': {
+        topics: {
+          'Wire Transfers': ['Domestic Wires', 'International Wires', 'SWIFT Messages', 'Wire Reversals'],
+          'ACH Processing': ['Batch Payments', 'Direct Deposits', 'ACH Returns', 'NOC Notices'],
+          'Check Processing': ['Check Images', 'MICR Data', 'Exception Items', 'Reconciliation'],
+          'Compliance': ['BSA/AML Reports', 'OFAC Screening', 'CTR Filings', 'SAR Reports']
+        }
+      },
+      'Auto 360': {
+        topics: {
+          'Vehicle Records': ['Registration Docs', 'Title History', 'Recall Notices', 'Emission Reports'],
+          'Insurance Policies': ['Auto Policies', 'Fleet Coverage', 'Gap Insurance', 'Roadside Assistance'],
+          'Accident Claims': ['Police Reports', 'Damage Photos', 'Repair Estimates', 'Rental Agreements'],
+          'Maintenance Logs': ['Service Records', 'Inspection Reports', 'Parts Replacements', 'Warranty Claims']
+        }
+      }
+    };
+
+    function getActiveKbs() {
+      return ConversationManager.active?.knowledgeBases || [];
+    }
+    function getActiveKb() {
+      const kbs = getActiveKbs();
+      return kbs.length ? kbs[0] : null;
+    }
+    function hasActiveKbs() {
+      return getActiveKbs().length > 0;
+    }
+
     const ConversationManager = {
       state: [],
       activeId: null,
@@ -5984,11 +6868,18 @@
           this.state = [];
           this.activeId = null;
         }
+        this.state.forEach(c => {
+          if (c.knowledgeBase && !c.knowledgeBases) {
+            c.knowledgeBases = [c.knowledgeBase];
+            delete c.knowledgeBase;
+          }
+          if (!c.knowledgeBases) c.knowledgeBases = [];
+        });
         if (!this.state.length) {
           this.state = [{
             id: 'conv_' + Math.random().toString(36).slice(2, 10),
             title: 'Insurance Claims',
-            knowledgeBase: document.getElementById('kbSelect').value,
+            knowledgeBases: [],
             role: currentRole,
             createdDate: new Date().toISOString(),
             updatedDate: new Date().toISOString(),
@@ -6015,13 +6906,15 @@
         this.save();
         UIManager.renderConversationList();
         WorkspaceManager.loadConversation();
+        KbPanel.render();
+        WorkspaceManager.updateHeaderTitle();
       },
       create() {
         const now = new Date().toISOString();
         const conv = {
           id: 'conv_' + Math.random().toString(36).slice(2, 10),
           title: 'New Conversation',
-          knowledgeBase: document.getElementById('kbSelect').value,
+          knowledgeBases: [],
           role: currentRole,
           createdDate: now,
           updatedDate: now,
@@ -6047,12 +6940,18 @@
     };
 
     const WorkspaceManager = {
+      updateHeaderTitle() {
+        const conv = ConversationManager.active;
+        const el = document.getElementById('headerConvTitle');
+        if (el) el.textContent = conv ? conv.title : 'Agent Console';
+      },
       loadConversation() {
         const conv = ConversationManager.active;
         const feed = document.getElementById('feed');
         const empty = document.getElementById('feedEmpty');
         if (!conv || !conv.messages.length) {
           feed.innerHTML = empty.outerHTML;
+          this.updateHeaderTitle();
           return;
         }
         feed.innerHTML = conv.messages.map((m) => `
@@ -6063,6 +6962,7 @@
           <div class="qbadge ok">${m.sender}</div>
         </div>
       </div>`).join('');
+        this.updateHeaderTitle();
       },
       newConversation() {
         ConversationManager.create();
@@ -6070,8 +6970,508 @@
         document.getElementById('cmdInput').focus();
         UIManager.renderConversationList();
         this.loadConversation();
+        KbPanel.render();
       }
     };
+
+    const KbPanel = {
+      _outsideClickBound: false,
+
+      _getTriggerText(selected) {
+        if (selected.length === 0) return 'Select KBs';
+        if (selected.length === AVAILABLE_KBS.length) return 'All KBs';
+        if (selected.length === 1) return selected[0];
+        return selected.length + ' KBs selected';
+      },
+
+      _applySelection(activeConv, selected, trigger, menu) {
+        activeConv.knowledgeBases = selected;
+        ConversationManager.save();
+        syncKbAccessFromActiveConversation();
+        this.render();
+      },
+
+      render() {
+        const panel = document.getElementById('kbPanel');
+        if (!panel) return;
+        const conv = ConversationManager.active;
+        const selected = conv ? (conv.knowledgeBases || []) : [];
+        const hasMessages = conv && conv.messages.length > 0;
+        const isArchived = conv && conv.isArchived;
+
+        if (!conv || isArchived) {
+          panel.classList.add('hidden');
+          return;
+        }
+
+        if (hasMessages) {
+          panel.classList.add('hidden');
+          return;
+        }
+
+        const allSelected = selected.length === AVAILABLE_KBS.length;
+        const hasSelection = selected.length > 0;
+        const triggerText = this._getTriggerText(selected);
+
+        panel.classList.remove('hidden');
+        panel.innerHTML = `
+          <span class="kb-panel-label">Knowledge Base:</span>
+          <div class="kb-dropdown">
+            <button class="kb-dropdown-trigger ${hasSelection ? 'has-selection' : ''}">
+              ${triggerText}
+              <span class="kb-trigger-chevron">&#9660;</span>
+            </button>
+            <div class="kb-dropdown-menu">
+              <label class="kb-dropdown-item" data-action="selectall">
+                <input type="checkbox" ${allSelected ? 'checked' : ''}>
+                <span>Select All</span>
+              </label>
+              <div class="kb-dropdown-divider"></div>
+              ${AVAILABLE_KBS.map(kb => {
+                const isChecked = selected.includes(kb);
+                return `<label class="kb-dropdown-item" data-action="kb" data-kb="${kb}">
+                  <input type="checkbox" ${isChecked ? 'checked' : ''}>
+                  <span>${kb}</span>
+                </label>`;
+              }).join('')}
+              <div class="kb-dropdown-divider"></div>
+              <label class="kb-dropdown-item kb-none-item" data-action="none">
+                <input type="checkbox" ${selected.length === 0 ? 'checked' : ''}>
+                <span>No KB</span>
+              </label>
+            </div>
+          </div>
+        `;
+
+        const trigger = panel.querySelector('.kb-dropdown-trigger');
+        const menu = panel.querySelector('.kb-dropdown-menu');
+        const activeConv = ConversationManager.active;
+
+        trigger.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const wasOpen = menu.classList.contains('open');
+          document.querySelectorAll('.kb-dropdown-menu.open').forEach(m => m.classList.remove('open'));
+          document.querySelectorAll('.kb-dropdown-trigger.open').forEach(t => t.classList.remove('open'));
+          if (!wasOpen) {
+            menu.classList.add('open');
+            trigger.classList.add('open');
+          }
+        });
+
+        const selectAllItem = panel.querySelector('[data-action="selectall"] input');
+        const noneItem = panel.querySelector('[data-action="none"] input');
+        const kbItems = panel.querySelectorAll('[data-action="kb"]');
+
+        selectAllItem.addEventListener('change', () => {
+          if (!activeConv) return;
+          if (selectAllItem.checked) {
+            activeConv.knowledgeBases = [...AVAILABLE_KBS];
+          } else {
+            activeConv.knowledgeBases = [];
+          }
+          this._applySelection(activeConv, activeConv.knowledgeBases, trigger, menu);
+        });
+
+        noneItem.addEventListener('change', () => {
+          if (!activeConv) return;
+          if (noneItem.checked) {
+            activeConv.knowledgeBases = [];
+            this._applySelection(activeConv, [], trigger, menu);
+          } else {
+            this._applySelection(activeConv, activeConv.knowledgeBases, trigger, menu);
+          }
+        });
+
+        kbItems.forEach(item => {
+          const cb = item.querySelector('input');
+          cb.addEventListener('change', () => {
+            if (!activeConv) return;
+            const kb = item.dataset.kb;
+            if (cb.checked) {
+              if (!activeConv.knowledgeBases.includes(kb)) {
+                activeConv.knowledgeBases.push(kb);
+              }
+            } else {
+              activeConv.knowledgeBases = activeConv.knowledgeBases.filter(k => k !== kb);
+            }
+            this._applySelection(activeConv, activeConv.knowledgeBases, trigger, menu);
+          });
+        });
+
+        if (!this._outsideClickBound) {
+          document.addEventListener('click', (e) => {
+            if (!e.target.closest('.kb-dropdown')) {
+              document.querySelectorAll('.kb-dropdown-menu.open').forEach(m => m.classList.remove('open'));
+              document.querySelectorAll('.kb-dropdown-trigger.open').forEach(t => t.classList.remove('open'));
+            }
+          });
+          this._outsideClickBound = true;
+        }
+      },
+      showPanel() {
+        const panel = document.getElementById('kbPanel');
+        if (panel) panel.classList.remove('hidden');
+      }
+    };
+
+    function validateUploadFile(file) {
+      const allowedExts = ['.pdf', '.docx', '.txt', '.csv'];
+      const maxSize = 10 * 1024 * 1024;
+      const name = file.name.toLowerCase();
+      const ext = name.substring(name.lastIndexOf('.'));
+      if (!allowedExts.includes(ext)) {
+        return '"' + file.name + '" — unsupported file type. Allowed: PDF, DOCX, TXT, CSV.';
+      }
+      if (file.size > maxSize) {
+        return '"' + file.name + '" — file exceeds 10MB limit (' + (file.size / 1048576).toFixed(1) + 'MB).';
+      }
+      return null;
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    function showUploadModal() {
+      const activeKB = getActiveKb() || AVAILABLE_KBS[0];
+      const kbData = KB_TOPICS[activeKB];
+      const topicNames = kbData ? Object.keys(kbData.topics) : [];
+      let selectedKB = activeKB;
+      let selectedTopic = topicNames[0] || '';
+      let selectedSubtopic = (kbData && kbData.topics[selectedTopic]) ? kbData.topics[selectedTopic][0] : '';
+      let selectedFiles = [];
+
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      document.body.appendChild(overlay);
+
+      function getSubtopics(kb, topic) {
+        const d = KB_TOPICS[kb];
+        if (!d || !d.topics[topic]) return [];
+        return d.topics[topic];
+      }
+
+      function renderFileList(fileListEl, validationEl) {
+        if (selectedFiles.length === 0) {
+          fileListEl.innerHTML = '';
+          return;
+        }
+        fileListEl.innerHTML = selectedFiles.map((f, i) => {
+          const icon = f.name.toLowerCase().endsWith('.pdf') ? '📄' :
+                       f.name.toLowerCase().endsWith('.docx') ? '📝' :
+                       f.name.toLowerCase().endsWith('.csv') ? '📊' : '📃';
+          return '<div class="upload-file-item">' +
+            '<span class="upload-file-icon">' + icon + '</span>' +
+            '<div class="upload-file-info">' +
+              '<span class="upload-file-name">' + f.name + '</span>' +
+              '<span class="upload-file-size">' + formatFileSize(f.size) + '</span>' +
+            '</div>' +
+            '<button class="remove-file" data-file-index="' + i + '">&times;</button>' +
+          '</div>';
+        }).join('');
+        fileListEl.querySelectorAll('.remove-file').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const idx = parseInt(btn.dataset.fileIndex);
+            selectedFiles.splice(idx, 1);
+            renderFileList(fileListEl, validationEl);
+            updateUploadBtn();
+          });
+        });
+      }
+
+      function addFiles(fileArray) {
+        const validationEl = overlay.querySelector('.upload-validation-msg');
+        let errors = [];
+        for (const f of fileArray) {
+          const err = validateUploadFile(f);
+          if (err) {
+            errors.push(err);
+          } else {
+            const duplicate = selectedFiles.some(sf => sf.name === f.name && sf.size === f.size);
+            if (!duplicate) selectedFiles.push(f);
+          }
+        }
+        if (errors.length > 0) {
+          validationEl.textContent = errors.join(' ');
+          validationEl.style.display = 'block';
+          setTimeout(() => { validationEl.style.display = 'none'; }, 4000);
+        } else {
+          validationEl.style.display = 'none';
+        }
+        const fileListEl = overlay.querySelector('.upload-file-list');
+        renderFileList(fileListEl, validationEl);
+        updateUploadBtn();
+      }
+
+      function updateUploadBtn() {
+        const btn = overlay.querySelector('[data-upload-action="upload"]');
+        if (btn) btn.disabled = selectedFiles.length === 0;
+      }
+
+      function renderForm() {
+        const currentKBData = KB_TOPICS[selectedKB];
+        const topics = currentKBData ? Object.keys(currentKBData.topics) : [];
+        if (!topics.includes(selectedTopic)) selectedTopic = topics[0] || '';
+        const subs = getSubtopics(selectedKB, selectedTopic);
+        if (!subs.includes(selectedSubtopic)) selectedSubtopic = subs[0] || '';
+
+        overlay.innerHTML =
+          '<div class="modal-container" style="max-width:560px;">' +
+            '<div class="modal-header-bar">' +
+              '<div class="modal-header-title"><span class="orange-dot"></span> Upload Documents</div>' +
+              '<button class="modal-close-btn" data-upload-action="close">&times;</button>' +
+            '</div>' +
+            '<div class="modal-content-wrap" style="padding:20px 24px;">' +
+              '<div class="field-grid">' +
+                '<div class="full">' +
+                  '<label>Knowledge Base</label>' +
+                  '<select id="uploadKbSelect">' +
+                    AVAILABLE_KBS.map(kb => '<option value="' + kb + '"' + (kb === selectedKB ? ' selected' : '') + '>' + kb + '</option>').join('') +
+                  '</select>' +
+                '</div>' +
+                '<div>' +
+                  '<label>Topic</label>' +
+                  '<select id="uploadTopicSelect">' +
+                    topics.map(t => '<option value="' + t + '"' + (t === selectedTopic ? ' selected' : '') + '>' + t + '</option>').join('') +
+                  '</select>' +
+                '</div>' +
+                '<div>' +
+                  '<label>Subtopic</label>' +
+                  '<select id="uploadSubtopicSelect">' +
+                    subs.map(s => '<option value="' + s + '"' + (s === selectedSubtopic ? ' selected' : '') + '>' + s + '</option>').join('') +
+                  '</select>' +
+                '</div>' +
+                '<div class="full">' +
+                  '<label>Files</label>' +
+                  '<div class="upload-dropzone" id="uploadDropzone">' +
+                    '<span class="upload-dropzone-icon">📁</span>' +
+                    '<div class="upload-dropzone-text">Drag & drop files here</div>' +
+                    '<div class="upload-dropzone-subtext">PDF, DOCX, TXT, CSV — Max 10MB each</div>' +
+                    '<button class="upload-browse-btn" id="uploadBrowseBtn">Browse Files</button>' +
+                    '<input type="file" id="uploadFileInput" multiple accept=".pdf,.docx,.txt,.csv" style="display:none;">' +
+                  '</div>' +
+                  '<div class="upload-validation-msg" style="display:none;"></div>' +
+                  '<div class="upload-file-list" id="uploadFileList"></div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="modal-actions">' +
+              '<button class="primary" data-upload-action="upload" disabled>Upload</button>' +
+              '<button class="secondary" data-upload-action="cancel">Cancel</button>' +
+            '</div>' +
+          '</div>';
+
+        const fileListEl = overlay.querySelector('#uploadFileList');
+        const validationEl = overlay.querySelector('.upload-validation-msg');
+        renderFileList(fileListEl, validationEl);
+        updateUploadBtn();
+
+        overlay.querySelector('#uploadKbSelect').addEventListener('change', (e) => {
+          selectedKB = e.target.value;
+          selectedFiles = [];
+          renderForm();
+        });
+
+        overlay.querySelector('#uploadTopicSelect').addEventListener('change', (e) => {
+          selectedTopic = e.target.value;
+          const subs = getSubtopics(selectedKB, selectedTopic);
+          selectedSubtopic = subs[0] || '';
+          const subSelect = overlay.querySelector('#uploadSubtopicSelect');
+          subSelect.innerHTML = subs.map(s => '<option value="' + s + '">' + s + '</option>').join('');
+        });
+
+        const dropzone = overlay.querySelector('#uploadDropzone');
+        const fileInput = overlay.querySelector('#uploadFileInput');
+        const browseBtn = overlay.querySelector('#uploadBrowseBtn');
+
+        browseBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          fileInput.click();
+        });
+
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        dropzone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+          dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropzone.classList.remove('dragover');
+          if (e.dataTransfer.files.length > 0) {
+            addFiles(Array.from(e.dataTransfer.files));
+          }
+        });
+
+        fileInput.addEventListener('change', () => {
+          if (fileInput.files.length > 0) {
+            addFiles(Array.from(fileInput.files));
+            fileInput.value = '';
+          }
+        });
+
+        overlay.querySelector('[data-upload-action="close"]').addEventListener('click', () => overlay.remove());
+        overlay.querySelector('[data-upload-action="cancel"]').addEventListener('click', () => overlay.remove());
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) overlay.remove();
+        });
+
+        overlay.querySelector('[data-upload-action="upload"]').addEventListener('click', () => {
+          showUploadProgress(overlay, selectedFiles, selectedKB, selectedTopic, selectedSubtopic);
+        });
+      }
+
+      renderForm();
+    }
+
+    function showUploadProgress(overlay, files, kb, topic, subtopic) {
+      const total = files.length;
+      let current = 0;
+
+      overlay.innerHTML =
+        '<div class="modal-container" style="max-width:480px;">' +
+          '<div class="modal-header-bar">' +
+            '<div class="modal-header-title"><span class="orange-dot"></span> Upload Documents</div>' +
+          '</div>' +
+          '<div class="modal-content-wrap" style="padding:32px 24px;text-align:center;">' +
+            '<div class="upload-progress-wrap">' +
+              '<div class="upload-progress-track"><div class="upload-progress-bar" id="uploadProgressBar"></div></div>' +
+              '<div class="upload-progress-text" id="uploadProgressText">Uploading file 1 of ' + total + '...</div>' +
+              '<div class="upload-progress-subtext" id="uploadProgressSubtext">' + files[0].name + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+
+      const bar = overlay.querySelector('#uploadProgressBar');
+      const text = overlay.querySelector('#uploadProgressText');
+      const subtext = overlay.querySelector('#uploadProgressSubtext');
+
+      function tick() {
+        current++;
+        const pct = Math.round((current / total) * 100);
+        bar.style.width = pct + '%';
+        if (current < total) {
+          text.textContent = 'Uploading file ' + (current + 1) + ' of ' + total + '...';
+          subtext.textContent = files[current].name;
+          setTimeout(tick, 400 + Math.random() * 300);
+        } else {
+          text.textContent = 'Processing...';
+          subtext.textContent = 'Indexing documents into ' + kb;
+          setTimeout(() => {
+            showUploadConfirmation(overlay, files, kb, topic, subtopic);
+          }, 800);
+        }
+      }
+
+      setTimeout(tick, 300);
+    }
+
+    function showUploadConfirmation(overlay, files, kb, topic, subtopic) {
+      const totalSize = files.reduce((sum, f) => sum + f.size, 0);
+
+      overlay.innerHTML =
+        '<div class="modal-container" style="max-width:480px;">' +
+          '<div class="modal-header-bar">' +
+            '<div class="modal-header-title"><span class="orange-dot"></span> Upload Documents</div>' +
+            '<button class="modal-close-btn" data-upload-action="done">&times;</button>' +
+          '</div>' +
+          '<div class="modal-content-wrap" style="padding:20px 24px;">' +
+            '<div class="modal-result" style="border:none;box-shadow:none;">' +
+              '<div class="modal-head">' +
+                '<div><b>Upload Complete</b><p>' + files.length + ' file' + (files.length > 1 ? 's' : '') + ' uploaded to ' + kb + '</p></div>' +
+                '<span class="conf" style="background:#DCFCE7;color:#16A34A;border:1px solid #BBF7D0;">Done</span>' +
+              '</div>' +
+              '<div class="modal-body">' +
+                '<div class="upload-meta-grid">' +
+                  '<div class="upload-meta-item"><span>Knowledge Base</span><b>' + kb + '</b></div>' +
+                  '<div class="upload-meta-item"><span>Total Size</span><b>' + formatFileSize(totalSize) + '</b></div>' +
+                  '<div class="upload-meta-item"><span>Topic</span><b>' + topic + '</b></div>' +
+                  '<div class="upload-meta-item"><span>Subtopic</span><b>' + subtopic + '</b></div>' +
+                '</div>' +
+                '<div class="upload-confirm-files">' +
+                  files.map(f => {
+                    const icon = f.name.toLowerCase().endsWith('.pdf') ? '📄' :
+                                 f.name.toLowerCase().endsWith('.docx') ? '📝' :
+                                 f.name.toLowerCase().endsWith('.csv') ? '📊' : '📃';
+                    return '<div class="upload-confirm-file"><span class="check-icon">✓</span> ' + icon + ' ' + f.name + ' <span style="color:var(--ink-soft);font-size:10px;">(' + formatFileSize(f.size) + ')</span></div>';
+                  }).join('') +
+                '</div>' +
+              '</div>' +
+              '<div class="modal-actions">' +
+                '<button class="primary" data-upload-action="done">Done</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+
+      overlay.querySelector('[data-upload-action="done"]').addEventListener('click', () => overlay.remove());
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.remove();
+      });
+    }
+
+    document.querySelector('.attach-btn').addEventListener('click', () => {
+      if (checkMatrixPermission('/upload', currentRole, currentKbAccess)) {
+        showUploadModal();
+      } else {
+        const tip = document.createElement('div');
+        tip.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1F2937;color:#fff;padding:8px 16px;border-radius:8px;font-size:11.5px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.2);';
+        tip.textContent = 'You don\'t have upload permission for this KB';
+        document.body.appendChild(tip);
+        setTimeout(() => tip.remove(), 2500);
+      }
+    });
+
+    function showKbRemovalConfirm(kbNames) {
+      return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+          <div class="modal-container" style="max-width:480px;">
+            <div class="modal-header-bar">
+              <div class="modal-header-title">
+                <span class="orange-dot"></span> Create New Knowledge Base
+              </div>
+              <button class="modal-close-btn" id="kbConfirmCancel">&times;</button>
+            </div>
+            <div class="modal-content-wrap" style="padding:20px 24px;">
+              <p style="font-size:13px;color:var(--ink);margin:0 0 12px;line-height:1.5;">
+                This conversation currently has KB(s) selected:
+              </p>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+                ${kbNames.map(k => `<span class="kb-badge" style="font-size:11px;padding:3px 10px;">${k}</span>`).join('')}
+              </div>
+              <p style="font-size:12px;color:var(--ink-soft);margin:0 0 20px;line-height:1.5;">
+                Creating a new KB will remove the selected KB(s) from this conversation and start fresh.
+              </p>
+              <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button class="secondary" id="kbConfirmCancelBtn" style="padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:12px;font-weight:600;">Cancel</button>
+                <button class="primary" id="kbConfirmProceedBtn" style="padding:8px 16px;border-radius:8px;border:none;background:var(--orange);color:#fff;cursor:pointer;font-size:12px;font-weight:600;">Proceed &amp; Remove KBs</button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        const cleanup = (result) => {
+          overlay.remove();
+          resolve(result);
+        };
+        overlay.querySelector('#kbConfirmCancelBtn').addEventListener('click', () => cleanup(false));
+        overlay.querySelector('#kbConfirmCancel').addEventListener('click', () => cleanup(false));
+        overlay.querySelector('#kbConfirmProceedBtn').addEventListener('click', () => cleanup(true));
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) cleanup(false);
+        });
+      });
+    }
 
     const UIManager = {
       getConversationFilter() {
@@ -6094,7 +7494,7 @@
       },
       matchesSearch(c, q) {
         if (!q) return true;
-        const haystack = [c.title, c.knowledgeBase, c.role, ...(c.tags || []), ...(c.messages || []).map(m => m.content)].join(' ').toLowerCase();
+        const haystack = [c.title, ...(c.knowledgeBases || []), c.role, ...(c.tags || []), ...(c.messages || []).map(m => m.content)].join(' ').toLowerCase();
         return haystack.includes(q);
       },
       formatTime(iso) {
@@ -6185,15 +7585,37 @@
       },
       renderConversationCard(c) {
         const archivedTag = c.isArchived ? '<span class="status-badge status-draft">Archived</span>' : '';
+        const pinIcon = c.isPinned ? '<span class="conv-pin-icon">📌</span>' : '';
+        const kbs = c.knowledgeBases || [];
+        let kbHtml;
+        if (kbs.length === 0) {
+          kbHtml = '<span class="kb-badge kb-badge-none">No KB</span>';
+        } else if (kbs.length <= 2) {
+          kbHtml = kbs.map(k => `<span class="kb-badge">${k}</span>`).join('');
+        } else {
+          kbHtml = `<span class="kb-badge">${kbs[0]}</span><span class="kb-badge">+${kbs.length - 1} more</span>`;
+        }
+        let iconHtml;
+        if (c.isArchived) {
+          iconHtml = '<div class="conv-icon" style="background:#F1F5F9;color:var(--ink-soft);">📦</div>';
+        } else if (kbs.length > 0) {
+          iconHtml = '<div class="conv-icon" style="background:#EEF2FF;color:#4F46E5;">🗄️</div>';
+        } else {
+          iconHtml = '<div class="conv-icon">💬</div>';
+        }
+        const lastMsg = (c.messages && c.messages.length) ? c.messages[c.messages.length - 1] : null;
+        const preview = lastMsg ? `<div class="conv-preview">${lastMsg.content}</div>` : '';
+        const msgCount = (c.messages && c.messages.length) ? `<span class="conv-msg-count">${c.messages.length} msg${c.messages.length !== 1 ? 's' : ''}</span>` : '';
         return `
       <div class="conv-card ${ConversationManager.activeId === c.id ? 'active' : ''}" data-conv-id="${c.id}">
         <div class="conv-menu"><button data-menu-id="${c.id}" title="More">⋯</button></div>
         <div class="conv-card-header">
-          <div class="conv-icon">💬</div>
+          ${iconHtml}
           <div class="conv-meta">
-            <div class="conv-title">${c.title}</div>
-            <div class="conv-sub"><span class="kb-badge">${c.knowledgeBase}</span>${c.tags?.length ? `<span>• ${c.tags.join(', ')}</span>` : ''}</div>
-            <div class="conv-time">${this.formatTime(c.updatedDate)}</div>
+            <div class="conv-title">${c.title}${pinIcon}</div>
+            <div class="conv-sub">${kbHtml}${c.tags?.length ? `<span>• ${c.tags.join(', ')}</span>` : ''}</div>
+            ${preview}
+            <div class="conv-time">${this.formatTime(c.updatedDate)} ${msgCount}</div>
           </div>
           <div style="display:flex;gap:6px;flex-direction:column;align-items:flex-end;">
             <div class="status-badge status-${c.status || 'draft'}">${c.status || 'draft'}</div>
@@ -6257,12 +7679,13 @@
     /* ================= INIT ================= */
     renderHeaderUser();
     ConversationManager.load();
-    syncKbAccessFromSelection(document.getElementById('kbSelect').value);
+    syncKbAccessFromActiveConversation();
     document.getElementById('conversationSearch').value = localStorage.getItem(STORAGE_KEYS.searchText) || '';
     renderAll();
     UIManager.renderConversationList();
     RosterManager.render();
     WorkspaceManager.loadConversation();
+    KbPanel.render();
 
     document.getElementById('newConversationBtn').addEventListener('click', WorkspaceManager.newConversation);
     document.getElementById('sidebarToggleBtn').addEventListener('click', () => {
