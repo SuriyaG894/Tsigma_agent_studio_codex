@@ -3411,6 +3411,12 @@
       margin-left: 8px;
     }
 
+    .context-strip .crew-header-pill {
+      margin-left: auto;
+      margin-right: 0;
+      background: var(--card);
+    }
+
     /* ================= PROVENANCE GRAPH (Fabric-Lineage style) ================= */
     .prov-graph-wrap {
       margin-top: 20px;
@@ -3601,20 +3607,12 @@
             <option value="admin">SUPER ADMIN</option>
           </select>
         </div>
-        <!-- Crew Roster Toggle Pill -->
-        <div class="crew-header-pill" onclick="toggleRoster()" title="Toggle Agent Roster">
-          <div class="crew-header-avatars">
-            <div class="crew-header-avatar" style="background:var(--orange);">OR</div>
-            <div class="crew-header-avatar" style="background:var(--blue);">RT</div>
-            <div class="crew-header-avatar" style="background:var(--blue);">IN</div>
-            <div class="crew-header-avatar" style="background:#94A3B8; color:#1E293B;">+6</div>
-          </div>
-          <span class="crew-header-text">Crew &middot; 9 active</span>
-        </div>
         <span class="h-email" id="hEmail"></span>
         <div class="h-avatar" id="hAvatar"></div>
       </div>
     </div>
+
+
 
     <!-- ================= BODY ================= -->
     <div class="body">
@@ -3730,6 +3728,15 @@
           <div class="ctx-item">Role: <b id="ctxRole" style="color:var(--ink)">Business Analyst</b></div>
           <div class="ctx-div"></div>
           <div class="ctx-item">KB access: <span class="ctx-badge badge-read" id="ctxKbBadge">READ</span></div>
+          <div class="crew-header-pill" onclick="toggleRoster()" title="Toggle Agent Roster">
+            <div class="crew-header-avatars">
+              <div class="crew-header-avatar" style="background:var(--orange);">OR</div>
+              <div class="crew-header-avatar" style="background:var(--blue);">RT</div>
+              <div class="crew-header-avatar" style="background:var(--blue);">IN</div>
+              <div class="crew-header-avatar" style="background:#94A3B8; color:#1E293B;">+6</div>
+            </div>
+            <span class="crew-header-text">Crew &middot; 9 active</span>
+          </div>
         </div>
 
         <div class="kb-panel" id="kbPanel">
@@ -8418,6 +8425,8 @@
       const navChats = document.getElementById('navChats');
       if (navChats) navChats.classList.toggle('active', open);
       localStorage.setItem(STORAGE_KEYS.sidebarOpen, open ? '1' : '0');
+      const crewPill = document.querySelector('.crew-header-pill');
+      if (crewPill) crewPill.style.display = open ? 'none' : '';
     }
 
     function setNavRailCollapsed(collapsed) {
