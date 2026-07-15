@@ -1270,6 +1270,10 @@
       display: none !important;
     }
 
+    .nav-rail.collapsed ~ .content-area .composer-wrap {
+      left: 68px;
+    }
+
     .nav-rail-spacer {
       flex: 1;
     }
@@ -1281,6 +1285,7 @@
       display: flex;
       flex-direction: column;
       position: relative;
+      padding-bottom: 72px;
     }
 
     .context-strip {
@@ -1340,11 +1345,17 @@
     }
 
     .composer-wrap {
-      padding: 16px 20px 10px;
-      background: #fff;
-      border-bottom: 1px solid var(--line);
-      flex-shrink: 0;
-      position: relative;
+      position: fixed;
+      bottom: 0;
+      left: 232px;
+      right: 0;
+      z-index: 50;
+      padding: 12px 0 10px;
+      background: transparent;
+    }
+
+    .sidebar.open ~ .canvas .composer-wrap {
+      display: none;
     }
 
     .composer {
@@ -1355,6 +1366,8 @@
       border-radius: 11px;
       padding: 6px;
       background: var(--bg);
+      max-width: 900px;
+      margin: 0 auto;
     }
 
     .composer:focus-within {
@@ -1442,7 +1455,7 @@
       position: absolute;
       left: 20px;
       right: 20px;
-      top: calc(100% - 4px);
+      bottom: 100%;
       background: #fff;
       border: 1px solid var(--line);
       border-radius: 10px;
@@ -1451,6 +1464,7 @@
       overflow-y: auto;
       display: none;
       z-index: 9;
+      margin-bottom: 4px;
     }
 
     .dropdown.show {
@@ -1491,6 +1505,7 @@
     .chip-row {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
       gap: 7px;
       margin-top: 10px;
     }
@@ -1558,6 +1573,9 @@
       border-radius: 12px;
       margin-bottom: 12px;
       overflow: hidden;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .run-card-head {
@@ -2575,7 +2593,6 @@
     }
 
     .context-strip,
-    .composer-wrap,
     .roster {
       background: #fff !important;
       border-color: #E7ECF3 !important;
