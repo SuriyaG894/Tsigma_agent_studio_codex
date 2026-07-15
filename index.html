@@ -1270,10 +1270,6 @@
       display: none !important;
     }
 
-    .nav-rail.collapsed ~ .content-area .composer-wrap {
-      left: 68px;
-    }
-
     .nav-rail-spacer {
       flex: 1;
     }
@@ -1285,7 +1281,6 @@
       display: flex;
       flex-direction: column;
       position: relative;
-      padding-bottom: 72px;
     }
 
     .context-strip {
@@ -1345,11 +1340,9 @@
     }
 
     .composer-wrap {
-      position: fixed;
-      bottom: 0;
-      left: 232px;
-      right: 0;
-      z-index: 50;
+      order: 1;
+      flex-shrink: 0;
+      z-index: 10;
       padding: 12px 80px 10px;
       background: transparent;
     }
@@ -1540,6 +1533,7 @@
       flex: 1;
       overflow-y: auto;
       padding: 16px 80px 30px;
+      scrollbar-gutter: stable;
     }
 
     /* ---- whatsapp-style chat bubbles ---- */
@@ -1553,14 +1547,10 @@
 
     .msg-row.user {
       justify-content: flex-end;
-      margin-left: auto;
-      margin-right: 0;
     }
 
     .msg-row.agent {
       justify-content: flex-start;
-      margin-left: 0;
-      margin-right: auto;
     }
 
     .msg-bubble {
@@ -8290,7 +8280,6 @@
     document.getElementById('conversationSearch').value = localStorage.getItem(STORAGE_KEYS.searchText) || '';
     renderAll();
     UIManager.renderConversationList();
-    console.log('[SIDEBAR DEBUG] Conversations loaded:', ConversationManager.state.length, '| Active ID:', ConversationManager.activeId, '| List children:', document.getElementById('conversationList')?.children.length);
     RosterManager.render();
     WorkspaceManager.loadConversation();
     KbPanel.render();
