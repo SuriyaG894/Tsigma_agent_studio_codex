@@ -598,7 +598,7 @@
     .kb-dropdown-trigger {
       font-size: 11px;
       font-weight: 600;
-      padding: 5px 28px 5px 12px;
+      padding: 5px 28px 5px 10px;
       border-radius: 6px;
       border: 1.5px solid var(--line);
       background: #fff;
@@ -639,20 +639,33 @@
       transform: translateY(-50%) rotate(180deg);
     }
 
+    .kb-trigger-icon {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
+      color: var(--orange);
+      vertical-align: -2px;
+      margin-right: 6px;
+    }
+
+    .kb-trigger-label {
+      vertical-align: middle;
+    }
+
     .kb-dropdown-menu {
       display: none;
       position: absolute;
-      top: calc(100% + 4px);
+      top: calc(100% + 6px);
       left: 0;
-      min-width: 220px;
-      max-width: 300px;
+      min-width: 280px;
+      max-width: 320px;
       background: #fff;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+      border-radius: 14px;
+      box-shadow: 0 12px 32px rgba(23, 26, 33, .14), 0 2px 8px rgba(23, 26, 33, .06);
       z-index: 1000;
-      padding: 4px 0;
-      max-height: 280px;
+      padding: 6px;
+      max-height: 340px;
       overflow-y: auto;
     }
 
@@ -660,15 +673,25 @@
       display: block;
     }
 
+    .kb-menu-heading {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      padding: 8px 10px 6px;
+    }
+
     .kb-dropdown-item {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 12px;
+      padding: 6px 10px;
       font-size: 11px;
       font-weight: 500;
       color: var(--ink);
       cursor: pointer;
+      border-radius: 9px;
       transition: background .1s ease;
       user-select: none;
     }
@@ -679,11 +702,12 @@
 
     .kb-dropdown-item input[type="checkbox"] {
       accent-color: var(--orange);
-      width: 13px;
-      height: 13px;
+      width: 15px;
+      height: 15px;
       margin: 0;
       cursor: pointer;
       flex-shrink: 0;
+      border-radius: 4px;
     }
 
     .kb-dropdown-item.kb-none-item {
@@ -691,10 +715,104 @@
       font-style: italic;
     }
 
+    .kb-dropdown-item.kb-rich-item {
+      padding: 8px 10px;
+      gap: 10px;
+    }
+
+    .kb-item-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .kb-item-name {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .kb-item-sub {
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--ink-soft);
+    }
+
+    .kb-item-coverage {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      padding: 2px 4px;
+    }
+
+    .kb-item-coverage.kb-cov-high {
+      color: var(--green);
+    }
+
+    .kb-item-coverage.kb-cov-mid {
+      color: var(--amber);
+    }
+
+    .kb-item-coverage.kb-cov-low {
+      color: var(--red);
+    }
+
     .kb-dropdown-divider {
       height: 1px;
       background: var(--line);
-      margin: 4px 0;
+      margin: 4px 6px;
+    }
+
+    .kb-active-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      background: transparent;
+    }
+
+    .kb-active-strip.hidden {
+      display: none;
+    }
+
+    .kb-active-icon {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
+      color: var(--orange);
+    }
+
+    .kb-active-chips {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .kb-active-chip {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--orange-deep);
+      background: var(--orange-tint);
+      border: 1px solid rgba(228, 87, 46, .25);
+      border-radius: 999px;
+      padding: 2px 10px;
+      white-space: nowrap;
+    }
+
+    .kb-active-none {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      font-style: italic;
     }
 
     .upload-dropzone {
@@ -3617,6 +3735,8 @@
         <div class="kb-panel" id="kbPanel">
           <span class="kb-panel-label">Knowledge Base:</span>
         </div>
+
+        <div class="kb-active-strip hidden" id="kbActiveStrip"></div>
 
         <div class="composer-wrap">
           <div class="composer">
@@ -7335,6 +7455,13 @@
 
     const AVAILABLE_KBS = ['Claims Management KB', 'AGS Insurance', 'Fed Payments', 'Auto 360'];
 
+    const KB_META = {
+      'Claims Management KB': { docs: 42, coverage: 61 },
+      'AGS Insurance': { docs: 28, coverage: 74 },
+      'Fed Payments': { docs: 15, coverage: 35 },
+      'Auto 360': { docs: 56, coverage: 82 }
+    };
+
     const KB_TOPICS = {
       'Claims Management KB': {
         topics: {
@@ -7500,6 +7627,7 @@
 
     const KbPanel = {
       _outsideClickBound: false,
+      _isOpen: false,
 
       _getTriggerText(selected) {
         if (selected.length === 0) return 'Select KBs';
@@ -7515,6 +7643,26 @@
         this.render();
       },
 
+      _renderActiveStrip(conv, selected) {
+        const strip = document.getElementById('kbActiveStrip');
+        if (!strip) return;
+        if (!conv || conv.isArchived) {
+          strip.classList.add('hidden');
+          return;
+        }
+        strip.classList.remove('hidden');
+        const icon = `<svg class="kb-active-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="3" width="16" height="18" rx="2"></rect>
+          <path d="M8 3v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3"></path>
+          <path d="M8 12h8M8 16h5"></path>
+        </svg>`;
+        if (selected.length === 0) {
+          strip.innerHTML = `${icon}<span class="kb-active-none">No knowledge base selected</span>`;
+        } else {
+          strip.innerHTML = `${icon}<div class="kb-active-chips">${selected.map(kb => `<span class="kb-active-chip">${kb}</span>`).join('')}</div>`;
+        }
+      },
+
       render() {
         const panel = document.getElementById('kbPanel');
         if (!panel) return;
@@ -7522,6 +7670,8 @@
         const selected = conv ? (conv.knowledgeBases || []) : [];
         const hasMessages = conv && conv.messages.length > 0;
         const isArchived = conv && conv.isArchived;
+
+        this._renderActiveStrip(conv, selected);
 
         if (!conv || isArchived) {
           panel.classList.add('hidden');
@@ -7541,11 +7691,17 @@
         panel.innerHTML = `
           <span class="kb-panel-label">Knowledge Base:</span>
           <div class="kb-dropdown">
-            <button class="kb-dropdown-trigger ${hasSelection ? 'has-selection' : ''}">
-              ${triggerText}
+            <button class="kb-dropdown-trigger ${hasSelection ? 'has-selection' : ''} ${this._isOpen ? 'open' : ''}">
+              <svg class="kb-trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="3" width="16" height="18" rx="2"></rect>
+                <path d="M8 3v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3"></path>
+                <path d="M8 12h8M8 16h5"></path>
+              </svg>
+              <span class="kb-trigger-label">${triggerText}</span>
               <span class="kb-trigger-chevron">&#9660;</span>
             </button>
-            <div class="kb-dropdown-menu">
+            <div class="kb-dropdown-menu ${this._isOpen ? 'open' : ''}">
+              <div class="kb-menu-heading">Select Knowledge Bases</div>
               <label class="kb-dropdown-item" data-action="selectall">
                 <input type="checkbox" ${allSelected ? 'checked' : ''}>
                 <span>Select All</span>
@@ -7553,9 +7709,15 @@
               <div class="kb-dropdown-divider"></div>
               ${AVAILABLE_KBS.map(kb => {
                 const isChecked = selected.includes(kb);
-                return `<label class="kb-dropdown-item" data-action="kb" data-kb="${kb}">
+                const meta = KB_META[kb] || { docs: 0, coverage: 0 };
+                const covClass = meta.coverage >= 70 ? 'kb-cov-high' : meta.coverage >= 40 ? 'kb-cov-mid' : 'kb-cov-low';
+                return `<label class="kb-dropdown-item kb-rich-item" data-action="kb" data-kb="${kb}">
                   <input type="checkbox" ${isChecked ? 'checked' : ''}>
-                  <span>${kb}</span>
+                  <div class="kb-item-main">
+                    <span class="kb-item-name">${kb}</span>
+                    <span class="kb-item-sub">${meta.docs} docs</span>
+                  </div>
+                  <span class="kb-item-coverage ${covClass}">${meta.coverage}%</span>
                 </label>`;
               }).join('')}
               <div class="kb-dropdown-divider"></div>
@@ -7573,10 +7735,10 @@
 
         trigger.addEventListener('click', (e) => {
           e.stopPropagation();
-          const wasOpen = menu.classList.contains('open');
+          this._isOpen = !this._isOpen;
           document.querySelectorAll('.kb-dropdown-menu.open').forEach(m => m.classList.remove('open'));
           document.querySelectorAll('.kb-dropdown-trigger.open').forEach(t => t.classList.remove('open'));
-          if (!wasOpen) {
+          if (this._isOpen) {
             menu.classList.add('open');
             trigger.classList.add('open');
           }
@@ -7625,6 +7787,7 @@
         if (!this._outsideClickBound) {
           document.addEventListener('click', (e) => {
             if (!e.target.closest('.kb-dropdown')) {
+              this._isOpen = false;
               document.querySelectorAll('.kb-dropdown-menu.open').forEach(m => m.classList.remove('open'));
               document.querySelectorAll('.kb-dropdown-trigger.open').forEach(t => t.classList.remove('open'));
             }
