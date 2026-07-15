@@ -1542,6 +1542,67 @@
       padding: 16px 20px 30px;
     }
 
+    /* ---- whatsapp-style chat bubbles ---- */
+    .msg-row {
+      display: flex;
+      margin-bottom: 8px;
+      max-width: 70%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .msg-row.user {
+      justify-content: flex-end;
+      margin-left: auto;
+      margin-right: 0;
+    }
+
+    .msg-row.agent {
+      justify-content: flex-start;
+      margin-left: 0;
+      margin-right: auto;
+    }
+
+    .msg-bubble {
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+
+    .msg-row.user .msg-bubble {
+      background: var(--orange);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-row.agent .msg-bubble {
+      background: #fff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg-time {
+      font-size: 10px;
+      margin-top: 3px;
+      opacity: .7;
+    }
+
+    .msg-row.user .msg-time {
+      text-align: right;
+      color: rgba(255,255,255,.8);
+    }
+
+    .msg-row.agent .msg-time {
+      color: var(--ink-soft);
+    }
+
+    .msg-content {
+      font-size: 13px;
+    }
+
     .feed-empty {
       text-align: center;
       padding: 60px 20px;
@@ -5473,29 +5534,45 @@
       const id = 'run' + runSeq;
       feedEmpty.style.display = 'none';
 
+      const userBubble = document.createElement('div');
+      userBubble.className = 'msg-row user';
+      userBubble.innerHTML = `
+        <div class="msg-bubble">
+          <div class="msg-content">${queryText}</div>
+          <div class="msg-time">${UIManager.formatTime(new Date().toISOString())}</div>
+        </div>`;
+      feed.appendChild(userBubble);
+
       const card = document.createElement('div');
-      card.className = 'run-card expanded';
+      card.className = 'msg-row agent';
       card.id = id;
       card.innerHTML = `
-    <div class="run-card-head">
-      <div class="run-status-dot running"></div>
-      <div class="qtext">${queryText}</div>
-      <div class="qbadge running">${mode === 'manual' ? 'Running · Manual' : 'Running'}</div>
-      <div class="chevron">▶</div>
-    </div>
-    <div class="run-card-body">
-      <div class="run-card-inner">
-        <div class="timeline"></div>
-        <div class="deny-slot"></div>
-        <div class="approval-slot"></div>
-        <div class="result-slot"></div>
+    <div class="msg-bubble">
+      <div class="msg-content">
+        <div class="run-card expanded">
+          <div class="run-card-head">
+            <div class="run-status-dot running"></div>
+            <div class="qtext">${mode === 'manual' ? 'Running · Manual' : 'Running'}</div>
+            <div class="qbadge running">${mode === 'manual' ? 'Manual' : 'Thinking…'}</div>
+            <div class="chevron">▶</div>
+          </div>
+          <div class="run-card-body">
+            <div class="run-card-inner">
+              <div class="timeline"></div>
+              <div class="deny-slot"></div>
+              <div class="approval-slot"></div>
+              <div class="result-slot"></div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  `;
-      feed.insertBefore(card, feed.firstChild);
+      <div class="msg-time">${UIManager.formatTime(new Date().toISOString())}</div>
+    </div>`;
+      feed.appendChild(card);
+      feed.scrollTop = feed.scrollHeight;
 
       card.querySelector('.run-card-head').addEventListener('click', () => {
-        card.classList.toggle('expanded');
+        card.querySelector('.run-card').classList.toggle('expanded');
       });
 
       const timelineEl = card.querySelector('.timeline');
@@ -7132,6 +7209,7 @@
             timestamp: new Date().toISOString(),
             status: 'completed'
           });
+          feed.scrollTop = feed.scrollHeight;
         }
         UIManager.renderConversationList();
         if (key === '/story') {
@@ -7411,13 +7489,13 @@
           return;
         }
         feed.innerHTML = conv.messages.map((m) => `
-      <div class="run-card">
-        <div class="run-card-head">
-          <div class="run-status-dot ${m.status || 'ok'}"></div>
-          <div class="qtext">${m.content}</div>
-          <div class="qbadge ok">${m.sender}</div>
+      <div class="msg-row ${m.sender}">
+        <div class="msg-bubble">
+          <div class="msg-content">${m.content}</div>
+          <div class="msg-time">${UIManager.formatTime(m.timestamp)}</div>
         </div>
       </div>`).join('');
+        feed.scrollTop = feed.scrollHeight;
         this.updateHeaderTitle();
       },
       newConversation() {
