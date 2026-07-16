@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Knowledge Base Agent Studio</title>
+  <title>KB Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
@@ -1207,7 +1207,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #fff;
+      color: var(--ink);
       font-weight: 800;
       font-size: 13px;
       white-space: nowrap;
@@ -1388,6 +1388,7 @@
     }
 
     .nav-recent-item {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -1425,6 +1426,72 @@
       overflow: hidden;
       text-overflow: ellipsis;
       flex: 1;
+    }
+
+    .nav-recent-menu {
+      position: absolute;
+      top: 50%;
+      right: 6px;
+      transform: translateY(-50%);
+      opacity: 0;
+      transition: opacity .15s ease;
+      z-index: 4;
+      flex-shrink: 0;
+    }
+
+    .nav-recent-item:hover .nav-recent-menu {
+      opacity: 1;
+    }
+
+    .nav-recent-menu-btn {
+      border: none;
+      background: transparent;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--rail-txt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .nav-recent-menu-btn:hover {
+      background: rgba(0, 0, 0, .08);
+    }
+
+    .nav-recent-menu-panel {
+      position: fixed;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .14);
+      padding: 4px;
+      display: none;
+      z-index: 30;
+      min-width: 120px;
+    }
+
+    .nav-recent-menu-panel.show {
+      display: block;
+    }
+
+    .nav-recent-menu-panel button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .nav-recent-menu-panel button:hover {
+      background: var(--orange-tint);
     }
 
     .nav-rail.collapsed .nav-recents {
@@ -3652,7 +3719,7 @@
     <div class="header">
       <div class="h-left">
         <div class="brand">
-          <div class="mark">Σ</div>Knowledge Base Agent Studio
+          <div class="mark">Σ</div>Knowledge Base
         </div>
         <span class="version-chip">v1.0.382</span>
       </div>
@@ -3680,7 +3747,7 @@
       <!-- nav rail (Claude-style left navigation) -->
       <nav class="nav-rail" id="navRail">
         <div class="nav-rail-top">
-          <div class="nav-rail-brand"><div class="mark">Σ</div><span>KB Studio</span></div>
+          <div class="nav-rail-brand"><span>KB Studio</span></div>
           <button class="nav-icon-btn" id="sidebarToggleBtn" title="Collapse sidebar" aria-label="Collapse sidebar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
@@ -3712,7 +3779,7 @@
 
         </div>
 
-        <div class="nav-recents" id="navRecents" style="display:none;">
+        <div class="nav-recents" id="navRecents">
           <div class="nav-section-label">Recents</div>
           <div class="nav-recents-list" id="navRecentsList"></div>
         </div>
@@ -5685,6 +5752,9 @@
     }
 
     async function startRun(queryText) {
+      if (!ConversationManager.active) {
+        ConversationManager.create();
+      }
       const cmd = resolveCommand(queryText);
       const key = cmd ? cmd[0] : null;
       if (key !== '/newkb' && !hasActiveKbs()) {
@@ -5692,9 +5762,12 @@
         return;
       }
       const activeConv = ConversationManager.active;
-      if (key !== '/newkb' && hasActiveKbs() && activeConv && activeConv.messages.length === 0) {
+      if (key !== '/newkb' && hasActiveKbs() && activeConv && !activeConv.kbLocked) {
         const confirmed = await showKbLockConfirm(getActiveKbs());
         if (!confirmed) return;
+        activeConv.kbLocked = true;
+        ConversationManager.save();
+        KbPanel.render();
       }
       const runStages = COMMAND_STAGES[key] || FULL_STAGES;
       const blocked = cmd ? !commandAllowed(cmd) : false;
@@ -7610,6 +7683,7 @@
             delete c.knowledgeBase;
           }
           if (!c.knowledgeBases) c.knowledgeBases = [];
+          if (typeof c.kbLocked === 'undefined') c.kbLocked = c.messages && c.messages.length > 0;
         });
         if (!this.state.length) {
           this.activeId = null;
@@ -7644,7 +7718,8 @@
           isPinned: false,
           isArchived: false,
           tags: [],
-          messages: []
+          messages: [],
+          kbLocked: false
         };
         this.state.unshift(conv);
         this.activeId = conv.id;
@@ -7753,7 +7828,7 @@
         if (!panel) return;
         const conv = ConversationManager.active;
         const selected = conv ? (conv.knowledgeBases || []) : [];
-        const hasMessages = conv && conv.messages.length > 0;
+        const isLocked = conv && conv.kbLocked;
         const isArchived = conv && conv.isArchived;
 
         this._renderActiveStrip(conv, selected);
@@ -7763,7 +7838,7 @@
           return;
         }
 
-        if (hasMessages) {
+        if (isLocked) {
           this._renderActiveStrip(conv, selected);
           const triggerText = this._getTriggerText(selected);
           panel.classList.remove('hidden');
@@ -8559,15 +8634,64 @@
         list.innerHTML = recent.map(c => `
           <div class="nav-recent-item ${ConversationManager.activeId === c.id ? 'active' : ''}" data-conv-id="${c.id}">
             <span class="nav-recent-dot"></span>
-            <span class="nav-recent-title">${c.title}</span>
+            <span class="nav-recent-title">${c.title}${c.isPinned ? ' 📌' : ''}</span>
+            <div class="nav-recent-menu">
+              <button class="nav-recent-menu-btn" data-nav-menu-id="${c.id}" title="Actions">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px;">
+                  <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
+                </svg>
+              </button>
+            </div>
           </div>
         `).join('');
-        list.querySelectorAll('[data-conv-id]').forEach(el =>
-          el.addEventListener('click', () => {
+        list.querySelectorAll('.nav-recent-item').forEach(el => {
+          el.addEventListener('click', (e) => {
+            if (e.target.closest('.nav-recent-menu')) return;
             ConversationManager.setActive(el.dataset.convId);
-            setSidebarState(false);
-          })
-        );
+          });
+        });
+        list.querySelectorAll('.nav-recent-menu-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const convId = btn.dataset.navMenuId;
+            const conv = ConversationManager.state.find(c => c.id === convId);
+            if (!conv) return;
+            const existing = document.getElementById('navRecentPortal');
+            if (existing) { existing.remove(); return; }
+            const rect = btn.getBoundingClientRect();
+            const portal = document.createElement('div');
+            portal.id = 'navRecentPortal';
+            portal.className = 'nav-recent-menu-panel show';
+            portal.style.position = 'fixed';
+            portal.style.top = rect.bottom + 4 + 'px';
+            portal.style.left = (rect.left - 80) + 'px';
+            portal.innerHTML = `
+              <button data-nav-action="rename" data-nav-action-id="${convId}">Rename</button>
+              <button data-nav-action="pin" data-nav-action-id="${convId}">${conv.isPinned ? 'Unpin' : 'Pin'}</button>
+              <button data-nav-action="delete" data-nav-action-id="${convId}" style="color:var(--red);">Delete</button>
+            `;
+            document.body.appendChild(portal);
+            portal.querySelectorAll('[data-nav-action]').forEach(actBtn => {
+              actBtn.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                const id = actBtn.dataset.navActionId;
+                const action = actBtn.dataset.navAction;
+                const c = ConversationManager.state.find(x => x.id === id);
+                if (!c) return;
+                if (action === 'rename') c.title = prompt('Rename conversation', c.title) || c.title;
+                if (action === 'pin') c.isPinned = !c.isPinned;
+                if (action === 'delete' && confirm('Delete this conversation?')) {
+                  ConversationManager.state = ConversationManager.state.filter(x => x.id !== id);
+                  if (ConversationManager.activeId === id) ConversationManager.activeId = ConversationManager.state[0]?.id || null;
+                }
+                ConversationManager.save();
+                portal.remove();
+                this.renderConversationList();
+                WorkspaceManager.loadConversation();
+              });
+            });
+          });
+        });
       }
     };
 
@@ -8643,11 +8767,9 @@
 
     document.getElementById('newConversationBtn').addEventListener('click', () => {
       WorkspaceManager.newConversation();
-      setSidebarState(false);
     });
     document.getElementById('newConversationBtnRail').addEventListener('click', () => {
       WorkspaceManager.newConversation();
-      setSidebarState(false);
     });
     // header/nav-rail collapse toggle (icon-only mode, Claude-style)
     document.getElementById('sidebarToggleBtn').addEventListener('click', () => {
@@ -8722,6 +8844,10 @@
         portal.style.display = 'none';
         portal.innerHTML = '';
         document.querySelectorAll('.conv-menu-panel.show').forEach(p => p.classList.remove('show'));
+      }
+      if (!e.target.closest('.nav-recent-menu') && !e.target.closest('#navRecentPortal')) {
+        const nrp = document.getElementById('navRecentPortal');
+        if (nrp) nrp.remove();
       }
     });
   </script>
