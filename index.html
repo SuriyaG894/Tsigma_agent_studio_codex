@@ -5770,6 +5770,7 @@
       const resultSlot = card.querySelector('.result-slot');
       const headDot = card.querySelector('.run-status-dot');
       const headBadge = card.querySelector('.qbadge');
+      const headText = card.querySelector('.qtext');
 
       timelineEl.innerHTML = runStages.map((s, i) =>
         `<div class="step" data-i="${i}"><div class="dot"></div>${s[0]}<span class="meta">${s[1]}</span></div>`
@@ -7195,6 +7196,7 @@
         headDot.className = 'run-status-dot ok';
         headBadge.className = 'qbadge ok';
         headBadge.textContent = 'Success';
+        headText.textContent = 'Completed';
 
         const key = cmd ? cmd[0] : null;
         resultSlot.innerHTML = renderResponseForCommand(key);
@@ -7491,6 +7493,7 @@
           headDot.className = 'run-status-dot blocked';
           headBadge.className = 'qbadge blocked';
           headBadge.textContent = 'Blocked';
+          headText.textContent = 'Blocked';
           timelineEl.style.display = 'none';
           denySlot.innerHTML = `
         <div class="deny-box">
@@ -7667,9 +7670,13 @@
       loadConversation() {
         const conv = ConversationManager.active;
         const feed = document.getElementById('feed');
-        const empty = document.getElementById('feedEmpty');
         if (!conv || !conv.messages.length) {
-          feed.innerHTML = empty.outerHTML;
+          feed.innerHTML = `
+            <div class="feed-empty" id="feedEmpty">
+              <div class="fmark">✦</div>
+              <h4>Start by describing your business requirement or selecting an existing artifact.</h4>
+              <p>The Agent Studio can retrieve knowledge, generate insights, validate requirements, create specifications, build implementation plans, and collaborate with connected systems.</p>
+            </div>`;
           this.updateHeaderTitle();
           return;
         }
@@ -7685,6 +7692,11 @@
         </div>
       </div>`;
         }).join('');
+        feed.querySelectorAll('.run-card-head').forEach(head => {
+          head.addEventListener('click', () => {
+            head.closest('.run-card').classList.toggle('expanded');
+          });
+        });
         feed.scrollTop = feed.scrollHeight;
         this.updateHeaderTitle();
       },
