@@ -31,6 +31,11 @@
       --red: #C4392E;
       --red-tint: #FCEBE9;
       --purple: #6E5FCC;
+      --glass-bg: rgba(255, 255, 255, 0.72);
+      --glass-bg-hover: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.45);
+      --glass-blur: 16px;
+      --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
     }
 
     * {
@@ -211,7 +216,7 @@
     }
 
     .body {
-      background: var(--bg);
+      background: linear-gradient(135deg, #F4F5F7 0%, #E8ECF4 30%, #FDEEE7 60%, #F4F5F7 100%);
     }
 
     .content-area {
@@ -225,8 +230,11 @@
     .sidebar {
       width: 100%;
       flex-shrink: 0;
-      background: var(--bg);
-      border-right: 1px solid var(--line);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border-right: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
       display: flex;
       flex-direction: column;
       min-width: 0;
@@ -1169,12 +1177,15 @@
     /* ---- nav rail (Claude-style left navigation) ---- */
     .nav-rail {
       width: 232px;
-      background: var(--navy);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
       padding: 14px 10px 12px;
-      border-right: 1px solid var(--navy-line);
+      border-right: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
       transition: width .18s ease, padding .18s ease;
       overflow: hidden;
     }
@@ -1506,17 +1517,20 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      border: 1.5px solid var(--line);
+      border: 1px solid var(--glass-border);
       border-radius: 11px;
       padding: 6px;
-      background: var(--bg);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      box-shadow: var(--glass-shadow);
       max-width: 900px;
       margin: 0 auto;
     }
 
     .composer:focus-within {
       border-color: var(--orange);
-      background: #fff;
+      background: var(--glass-bg-hover);
     }
 
     .attach-btn {
@@ -1536,6 +1550,29 @@
     }
 
     .attach-btn:hover {
+      border-color: var(--orange);
+      background: var(--orange-tint);
+      color: var(--orange);
+    }
+
+    .slash-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink-soft);
+      transition: all .15s ease;
+    }
+
+    .slash-btn:hover {
       border-color: var(--orange);
       background: var(--orange-tint);
       color: var(--orange);
@@ -2776,8 +2813,6 @@
     }
 
     .nav-rail {
-      background: #fff !important;
-      border-right: 1px solid #E7ECF3 !important;
     }
 
     .nav-item {
@@ -2791,7 +2826,6 @@
 
     .canvas,
     .body {
-      background: #F6F8FB !important;
     }
 
     .context-strip,
@@ -2922,10 +2956,7 @@
     }
 
     .composer {
-      background: #fff !important;
-      border: 1px solid var(--line) !important;
       border-radius: 14px !important;
-      box-shadow: 0 6px 20px rgba(15, 23, 42, .04) !important;
     }
 
     .run-card,
@@ -3775,8 +3806,9 @@
         <div class="composer-wrap">
           <div class="composer">
             <button class="attach-btn">+</button>
+            <button class="slash-btn" id="slashBtn" title="Slash commands">/</button>
             <input class="cmd-input" id="cmdInput"
-              placeholder="Describe what you want built — a story ID, a BRD, or type / for commands...">
+              placeholder="Describe what you want built — or click / for commands...">
             <div class="mode-toggle">
               <button class="active" data-mode="auto">Auto</button>
               <button data-mode="manual">Manual</button>
@@ -8173,6 +8205,22 @@
         tip.textContent = 'You don\'t have upload permission for this KB';
         document.body.appendChild(tip);
         setTimeout(() => tip.remove(), 2500);
+      }
+    });
+
+    document.getElementById('slashBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const allowed = COMMANDS.filter(c => commandAllowed(c));
+      slashDropdown.innerHTML = allowed.length
+        ? allowed.map(c => `<div class="dd-item" data-full="${c[0]}"><span>${c[1]}</span><small>${c[0]}</small></div>`).join('')
+        : '<div class="dd-item locked"><span>No commands available for your role</span></div>';
+      slashDropdown.classList.toggle('show');
+      mentionDropdown.classList.remove('show');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.slash-btn') && !e.target.closest('#slashDropdown')) {
+        slashDropdown.classList.remove('show');
       }
     });
 
