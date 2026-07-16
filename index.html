@@ -822,6 +822,31 @@
       font-style: italic;
     }
 
+    .kb-panel-locked {
+      opacity: 0.6;
+    }
+
+    .kb-dropdown-locked .kb-dropdown-trigger {
+      cursor: not-allowed;
+      background: #F1F5F9;
+      border-color: var(--line);
+    }
+
+    .kb-dropdown-locked .kb-dropdown-trigger:hover {
+      background: #F1F5F9;
+      border-color: var(--line);
+    }
+
+    .kb-dropdown-locked .kb-trigger-chevron {
+      display: none;
+    }
+
+    .kb-lock-icon {
+      font-size: 10px;
+      margin-left: 6px;
+      opacity: 0.5;
+    }
+
     .upload-dropzone {
       border: 2px dashed var(--line);
       border-radius: 12px;
@@ -3599,9 +3624,6 @@
           <div class="mark">Σ</div>Knowledge Base Agent Studio
         </div>
         <span class="version-chip">v1.0.382</span>
-        <div class="crumb">
-          <span id="headerConvTitle">Agent Console</span>
-        </div>
       </div>
       <div class="h-right">
         <div class="impersonate">
@@ -5630,9 +5652,18 @@
       }));
     }
 
-    function startRun(queryText) {
+    async function startRun(queryText) {
       const cmd = resolveCommand(queryText);
       const key = cmd ? cmd[0] : null;
+      if (key !== '/newkb' && !hasActiveKbs()) {
+        await showKbRequiredWarning();
+        return;
+      }
+      const activeConv = ConversationManager.active;
+      if (key !== '/newkb' && hasActiveKbs() && activeConv && activeConv.messages.length === 0) {
+        const confirmed = await showKbLockConfirm(getActiveKbs());
+        if (!confirmed) return;
+      }
       const runStages = COMMAND_STAGES[key] || FULL_STAGES;
       const blocked = cmd ? !commandAllowed(cmd) : false;
       const mode = currentMode();
@@ -5640,7 +5671,6 @@
       const kbData = KB_STORY_DATA[selectedKb] || KB_STORY_DATA["Claims Management KB"];
       const runContext = { kb: selectedKb, kbData, stageEdits: {} };
       window._activeRunContext = runContext;
-      const activeConv = ConversationManager.active;
       if (activeConv && activeConv.title === 'New Conversation') {
         activeConv.title = queryText.slice(0, 42);
         WorkspaceManager.updateHeaderTitle();
@@ -5655,6 +5685,7 @@
         timestamp: new Date().toISOString()
       });
       UIManager.renderConversationList();
+      KbPanel.render();
 
       runSeq++;
       const id = 'run' + runSeq;
@@ -7297,7 +7328,8 @@
               attachments: [],
               toolCalls: [],
               timestamp: new Date().toISOString(),
-              status: 'completed'
+              status: 'completed',
+              runCardHtml: card.outerHTML
             });
             UIManager.renderConversationList();
           });
@@ -7319,7 +7351,8 @@
             attachments: [],
             toolCalls: [],
             timestamp: new Date().toISOString(),
-            status: 'completed'
+            status: 'completed',
+            runCardHtml: card.outerHTML
           });
           UIManager.renderConversationList();
         }
@@ -7333,7 +7366,8 @@
             attachments: [],
             toolCalls: [],
             timestamp: new Date().toISOString(),
-            status: 'completed'
+            status: 'completed',
+            runCardHtml: card.outerHTML
           });
           feed.scrollTop = feed.scrollHeight;
         }
@@ -7543,21 +7577,7 @@
           if (!c.knowledgeBases) c.knowledgeBases = [];
         });
         if (!this.state.length) {
-          this.state = [{
-            id: 'conv_' + Math.random().toString(36).slice(2, 10),
-            title: 'Insurance Claims',
-            knowledgeBases: [],
-            role: currentRole,
-            createdDate: new Date().toISOString(),
-            updatedDate: new Date().toISOString(),
-            status: 'completed',
-            isPinned: false,
-            isArchived: false,
-            tags: ['claims', 'insurance'],
-            messages: []
-          }];
-          this.activeId = this.state[0].id;
-          this.save();
+          this.activeId = null;
         }
         if (!this.state.find(c => c.id === this.activeId)) this.activeId = this.state[0]?.id || null;
       },
@@ -7621,13 +7641,18 @@
           this.updateHeaderTitle();
           return;
         }
-        feed.innerHTML = conv.messages.map((m) => `
+        feed.innerHTML = conv.messages.map((m) => {
+          if (m.sender === 'agent' && m.runCardHtml) {
+            return m.runCardHtml;
+          }
+          return `
       <div class="msg-row ${m.sender}">
         <div class="msg-bubble">
           <div class="msg-content">${m.content}</div>
           <div class="msg-time">${UIManager.formatTime(m.timestamp)}</div>
         </div>
-      </div>`).join('');
+      </div>`;
+        }).join('');
         feed.scrollTop = feed.scrollHeight;
         this.updateHeaderTitle();
       },
@@ -7695,7 +7720,24 @@
         }
 
         if (hasMessages) {
-          panel.classList.add('hidden');
+          this._renderActiveStrip(conv, selected);
+          const triggerText = this._getTriggerText(selected);
+          panel.classList.remove('hidden');
+          panel.classList.add('kb-panel-locked');
+          panel.innerHTML = `
+            <span class="kb-panel-label">Knowledge Base:</span>
+            <div class="kb-dropdown kb-dropdown-locked" title="KB selection is locked for this conversation">
+              <button class="kb-dropdown-trigger has-selection locked" disabled title="KB selection is locked for this conversation">
+                <svg class="kb-trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="3" width="16" height="18" rx="2"></rect>
+                  <path d="M8 3v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3"></path>
+                  <path d="M8 12h8M8 16h5"></path>
+                </svg>
+                <span class="kb-trigger-label">${triggerText}</span>
+                <span class="kb-lock-icon">&#128274;</span>
+              </button>
+            </div>
+          `;
           return;
         }
 
@@ -7704,6 +7746,7 @@
         const triggerText = this._getTriggerText(selected);
 
         panel.classList.remove('hidden');
+        panel.classList.remove('kb-panel-locked');
         panel.innerHTML = `
           <span class="kb-panel-label">Knowledge Base:</span>
           <div class="kb-dropdown">
@@ -8170,6 +8213,79 @@
         overlay.querySelector('#kbConfirmCancelBtn').addEventListener('click', () => cleanup(false));
         overlay.querySelector('#kbConfirmCancel').addEventListener('click', () => cleanup(false));
         overlay.querySelector('#kbConfirmProceedBtn').addEventListener('click', () => cleanup(true));
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) cleanup(false);
+        });
+      });
+    }
+
+    function showKbRequiredWarning() {
+      return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+          <div class="modal-container" style="max-width:440px;">
+            <div class="modal-header-bar">
+              <div class="modal-header-title">
+                <span class="orange-dot"></span> Knowledge Base Required
+              </div>
+              <button class="modal-close-btn" id="kbWarnClose">&times;</button>
+            </div>
+            <div class="modal-content-wrap" style="padding:20px 24px;">
+              <p style="font-size:13px;color:var(--ink);margin:0 0 16px;line-height:1.5;">
+                Please select at least one Knowledge Base before starting a conversation.
+              </p>
+              <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button class="primary" id="kbWarnOkBtn" style="padding:8px 16px;border-radius:8px;border:none;background:var(--orange);color:#fff;cursor:pointer;font-size:12px;font-weight:600;">OK</button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        const cleanup = () => { overlay.remove(); resolve(); };
+        overlay.querySelector('#kbWarnOkBtn').addEventListener('click', cleanup);
+        overlay.querySelector('#kbWarnClose').addEventListener('click', cleanup);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) cleanup(); });
+      });
+    }
+
+    function showKbLockConfirm(kbNames) {
+      return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+          <div class="modal-container" style="max-width:480px;">
+            <div class="modal-header-bar">
+              <div class="modal-header-title">
+                <span class="orange-dot"></span> Lock Knowledge Base
+              </div>
+              <button class="modal-close-btn" id="kbLockClose">&times;</button>
+            </div>
+            <div class="modal-content-wrap" style="padding:20px 24px;">
+              <p style="font-size:13px;color:var(--ink);margin:0 0 12px;line-height:1.5;">
+                This conversation will use the following Knowledge Base(s):
+              </p>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+                ${kbNames.map(k => `<span class="kb-badge" style="font-size:11px;padding:3px 10px;">${k}</span>`).join('')}
+              </div>
+              <p style="font-size:12px;color:var(--ink-soft);margin:0 0 20px;line-height:1.5;">
+                Knowledge Base selection will be locked for this conversation. You won\u2019t be able to change it after this.
+              </p>
+              <div style="display:flex;gap:10px;justify-content:flex-end;">
+                <button class="secondary" id="kbLockGoBackBtn" style="padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:12px;font-weight:600;">Go Back</button>
+                <button class="primary" id="kbLockProceedBtn" style="padding:8px 16px;border-radius:8px;border:none;background:var(--orange);color:#fff;cursor:pointer;font-size:12px;font-weight:600;">Proceed</button>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        const cleanup = (result) => {
+          overlay.remove();
+          resolve(result);
+        };
+        overlay.querySelector('#kbLockGoBackBtn').addEventListener('click', () => cleanup(false));
+        overlay.querySelector('#kbLockClose').addEventListener('click', () => cleanup(false));
+        overlay.querySelector('#kbLockProceedBtn').addEventListener('click', () => cleanup(true));
         overlay.addEventListener('click', (e) => {
           if (e.target === overlay) cleanup(false);
         });
