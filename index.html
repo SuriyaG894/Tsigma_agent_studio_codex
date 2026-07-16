@@ -581,6 +581,13 @@
       display: none;
     }
 
+    .kb-panel.kb-panel-ctx {
+      padding: 0;
+      background: transparent;
+      border-bottom: none;
+      flex-wrap: nowrap;
+    }
+
     .kb-panel-label {
       font-size: 11px;
       font-weight: 600;
@@ -1463,6 +1470,7 @@
       z-index: 10;
       padding: 12px 80px 10px;
       background: transparent;
+      position: relative;
     }
 
     .sidebar.open ~ .canvas .composer-wrap {
@@ -3723,11 +3731,12 @@
         <!-- center canvas -->
         <div class="canvas">
           <div class="context-strip">
-            <div class="ctx-item"><span class="ctx-dot"></span> Orchestrator ready</div>
+            <div class="ctx-item"><span class="ctx-dot"></span> Ready</div>
             <div class="ctx-div"></div>
-          <div class="ctx-item">Role: <b id="ctxRole" style="color:var(--ink)">Business Analyst</b></div>
+          <div class="kb-panel kb-panel-ctx" id="kbPanel">
+            <span class="kb-panel-label">Knowledge Base:</span>
+          </div>
           <div class="ctx-div"></div>
-          <div class="ctx-item">KB access: <span class="ctx-badge badge-read" id="ctxKbBadge">READ</span></div>
           <div class="crew-header-pill" onclick="toggleRoster()" title="Toggle Agent Roster">
             <div class="crew-header-avatars">
               <div class="crew-header-avatar" style="background:var(--orange);">OR</div>
@@ -3737,10 +3746,6 @@
             </div>
             <span class="crew-header-text">Crew &middot; 9 active</span>
           </div>
-        </div>
-
-        <div class="kb-panel" id="kbPanel">
-          <span class="kb-panel-label">Knowledge Base:</span>
         </div>
 
         <div class="kb-active-strip hidden" id="kbActiveStrip"></div>
@@ -3764,9 +3769,8 @@
         <div class="feed" id="feed">
           <div class="feed-empty" id="feedEmpty">
             <div class="fmark">✦</div>
-            <h4>No runs yet this session</h4>
-            <p>Try a command below, or type a plain instruction. The Orchestrator checks your role and KB access matrix
-              rules before running.</p>
+            <h4>Start by describing your business requirement or selecting an existing artifact.</h4>
+            <p>The Agent Studio can retrieve knowledge, generate insights, validate requirements, create specifications, build implementation plans, and collaborate with connected systems.</p>
           </div>
         </div>
       </div>
@@ -4852,10 +4856,8 @@
 
     /* ================= RENDER ARCHITECTURE ================= */
     function renderContext() {
-      document.getElementById('ctxRole').textContent = ROLES[currentRole].label;
-      const badge = document.getElementById('ctxKbBadge');
-      badge.textContent = currentKbAccess.toUpperCase();
-      badge.className = 'ctx-badge badge-' + currentKbAccess;
+      // Role and KB access indicators were removed from the context-strip;
+      // the KB selection dropdown (KbPanel) now lives there instead.
     }
 
     function renderChips() {
@@ -5059,7 +5061,14 @@
 
     /* ================= LIVE STREAM RUN SIMULATION ================= */
     const feed = document.getElementById('feed');
-    const feedEmpty = document.getElementById('feedEmpty');
+
+    // The empty-state placeholder gets recreated (new DOM node) whenever
+    // WorkspaceManager.loadConversation() rewrites feed.innerHTML, so we
+    // always look it up fresh here rather than caching a stale reference.
+    function hideFeedEmpty() {
+      const el = document.getElementById('feedEmpty');
+      if (el) el.remove();
+    }
 
     const COMMAND_STAGES = {
       '/newkb': [
@@ -5260,7 +5269,7 @@
 
     // Opens a story from a listed section directly in the chat feed as its own run card.
     window.openStoryInChat = function (id, section) {
-      feedEmpty.style.display = 'none';
+      hideFeedEmpty();
 
       if (section === 'completed') {
         const story = USER_STORIES_COMPLETED.find(s => s.id === id);
@@ -5649,7 +5658,7 @@
 
       runSeq++;
       const id = 'run' + runSeq;
-      feedEmpty.style.display = 'none';
+      hideFeedEmpty();
 
       const userBubble = document.createElement('div');
       userBubble.className = 'msg-row user';
