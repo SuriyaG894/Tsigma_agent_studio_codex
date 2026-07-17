@@ -2160,7 +2160,7 @@
     /* ================= MANUAL FLOW: DECISION & ACTION CARDS ================= */
     .decision-card {
       margin-top: 8px;
-      background: #EFF6FF;
+      background: var(--blue-tint);
       border: 1px solid #BFDBFE;
       border-radius: 9px;
       padding: 12px 14px;
@@ -2173,14 +2173,14 @@
     }
     .decision-card .dc-head b, .retrieval-review-card .dc-head b, .spec-complete-card .dc-head b, .terminated-card .dc-head b {
       font-size: 12.5px;
-      color: #1E40AF;
+      color: var(--orange);
     }
     .decision-card .dc-agent-icon {
       font-size: 18px;
     }
     .decision-card .dc-message, .retrieval-review-card .dc-message, .spec-complete-card .dc-message, .terminated-card .dc-message {
       font-size: 12px;
-      color: #1E3A5F;
+      color: var(--ink-soft);
       line-height: 1.6;
       margin-bottom: 10px;
     }
@@ -2190,7 +2190,7 @@
       flex-wrap: wrap;
     }
     .dc-primary {
-      background: #0D9488 !important;
+      background: var(--orange) !important;
       color: #fff !important;
       border: none !important;
       padding: 6px 14px;
@@ -2199,10 +2199,13 @@
       font-weight: 600;
       cursor: pointer;
     }
+    .dc-primary:hover {
+      background: var(--orange-deep) !important;
+    }
     .dc-secondary {
       background: #fff !important;
-      color: #374151 !important;
-      border: 1px solid #D1D5DB !important;
+      color: var(--ink) !important;
+      border: 1px solid var(--line) !important;
       padding: 6px 14px;
       border-radius: 7px;
       font-size: 11.5px;
@@ -2210,7 +2213,9 @@
       cursor: pointer;
     }
     .dc-secondary:hover {
-      background: #F3F4F6;
+      background: var(--orange-tint);
+      border-color: var(--orange) !important;
+      color: var(--orange) !important;
     }
     .dc-danger {
       background: transparent !important;
@@ -2230,7 +2235,7 @@
     /* Retrieval Review Card */
     .retrieval-review-card {
       margin-top: 8px;
-      background: #F0FDF4;
+      background: var(--green-tint);
       border: 1px solid #BBF7D0;
       border-radius: 9px;
       padding: 12px 14px;
@@ -2239,7 +2244,7 @@
     /* Spec Complete Card */
     .spec-complete-card {
       margin-top: 8px;
-      background: #F5F3FF;
+      background: var(--blue-tint);
       border: 1px solid #DDD6FE;
       border-radius: 9px;
       padding: 12px 14px;
@@ -5381,6 +5386,14 @@
     /* ================= LIVE STREAM RUN SIMULATION ================= */
     const feed = document.getElementById('feed');
 
+    feed.addEventListener('click', function(e) {
+      var wizBtn = e.target.closest('.terminated-card [data-action="open-wizard"]');
+      if (wizBtn) {
+        var stage = parseInt(wizBtn.dataset.completedStage) || 0;
+        openFullStoryWizardModal(null, stage, 'story', stage);
+      }
+    });
+
     // The empty-state placeholder gets recreated (new DOM node) whenever
     // WorkspaceManager.loadConversation() rewrites feed.innerHTML, so we
     // always look it up fresh here rather than caching a stale reference.
@@ -6431,7 +6444,7 @@
       };
 
       window.switchModalStage = function (stageNum) {
-        if (stageNum > (window.activeModalMaxStage || 4)) {
+        if (stageNum > (window.activeModalMaxStage != null ? window.activeModalMaxStage : 4)) {
           var _toast = document.createElement('div');
           _toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1F2937;color:#fff;padding:8px 16px;border-radius:8px;font-size:11.5px;font-weight:600;z-index:10000;box-shadow:0 4px 12px rgba(0,0,0,.2);';
           _toast.textContent = 'Complete earlier stages in the chat first to unlock this stage.';
@@ -6463,8 +6476,8 @@
         const kb = kbName || getActiveKb() || 'Claims Management KB';
         const isDevOnly = ['developer', 'dev_admin'].includes(currentRole);
 
-        let activeStage = stageNum || (flowType === 'steering' ? 5 : (isDevOnly ? 4 : 4));
-        if (isDevOnly && activeStage < 4) {
+        let activeStage = stageNum != null ? stageNum : (flowType === 'steering' ? 5 : (isDevOnly ? 4 : 4));
+        if (isDevOnly && activeStage > 0 && activeStage < 4) {
           activeStage = 4;
         }
 
@@ -6481,7 +6494,7 @@
         window.activeModalKb = kb;
         window.activeModalStage = activeStage;
         window.activeModalFlowType = flow;
-        window.activeModalMaxStage = maxCompletedStage || activeStage || 4;
+        window.activeModalMaxStage = maxCompletedStage != null ? maxCompletedStage : (activeStage != null ? activeStage : 4);
 
         const modal = document.getElementById('stageWizardModal');
         if (!modal) return;
@@ -6890,10 +6903,10 @@
           ];
         }
 
-        var maxStage = window.activeModalMaxStage || activeStage || 4;
+        var maxStage = window.activeModalMaxStage != null ? window.activeModalMaxStage : (activeStage != null ? activeStage : 4);
         var totalSteps = stepsData.length;
         var accessibleSteps = stepsData.filter(function(s) { return s.num <= maxStage; }).length;
-        progressWidth = totalSteps > 1 ? Math.round(((accessibleSteps - 1) / (totalSteps - 1)) * 100) + '%' : '0%';
+        progressWidth = totalSteps > 1 && accessibleSteps > 0 ? Math.round(((accessibleSteps - 1) / (totalSteps - 1)) * 100) + '%' : '0%';
 
         stepsHTML = stepsData.map(s => {
           let cls = '';
@@ -7559,6 +7572,9 @@
 
         if (key === '/push') {
           handledAsInteractive = true;
+          approvalSlot.innerHTML = '';
+          var runBody = card.querySelector('.run-card-body');
+          if (runBody) runBody.style.maxHeight = 'none';
           wirePushFlow();
         }
 
@@ -7599,33 +7615,46 @@
         }
         UIManager.renderConversationList();
         if (key === '/story' && mode === 'manual') {
-          resultSlot.innerHTML += renderSpecCompleteCard();
-          var markBtn = resultSlot.querySelector('[data-action="mark-complete"]');
-          var wizardBtn = resultSlot.querySelector('[data-action="open-wizard"]');
+          resultSlot.insertAdjacentHTML('beforeend', renderSpecCompleteCard());
+          var specCard = resultSlot.querySelector('.spec-complete-card');
+          var markBtn = specCard ? specCard.querySelector('[data-action="mark-complete"]') : null;
+          var wizardBtn = specCard ? specCard.querySelector('[data-action="open-wizard"]') : null;
           if (markBtn) {
             markBtn.addEventListener('click', function() {
-              markBtn.closest('.dc-actions').innerHTML =
+              var actionsDiv = markBtn.closest('.dc-actions');
+              if (!actionsDiv) return;
+              actionsDiv.innerHTML =
                 '<button class="dc-primary" data-action="push-devops">🚀 Push to DevOps</button>' +
                 '<button class="dc-secondary" data-action="dismiss">Dismiss</button>';
-              var head2 = resultSlot.querySelector('.spec-complete-card .dc-head b');
+              var head2 = specCard.querySelector('.dc-head b');
               if (head2) head2.textContent = 'Story Completed';
-              var msg2 = resultSlot.querySelector('.spec-complete-card .dc-message');
+              var msg2 = specCard.querySelector('.dc-message');
               if (msg2) msg2.textContent = '"' + (runContext.storyDescription || 'your story') + '" has been marked as completed and moved to the Completed section.';
-              resultSlot.querySelector('[data-action="push-devops"]').addEventListener('click', function() {
-                var storyTitle = runContext.storyDescription || 'User Story';
-                var newStoryId = 'story_' + Math.random().toString(36).slice(2, 8);
-                STORY_QUEUE.unshift({
-                  id: newStoryId,
-                  title: storyTitle,
-                  timestamp: 'Just now',
-                  tags: ['#Manual', '#Completed']
+              var pushBtn = specCard.querySelector('[data-action="push-devops"]');
+              var dismissBtn = specCard.querySelector('[data-action="dismiss"]');
+              if (pushBtn) {
+                pushBtn.addEventListener('click', function() {
+                  var storyTitle = runContext.storyDescription || 'User Story';
+                  var newStoryId = 'story_' + Math.random().toString(36).slice(2, 8);
+                  STORY_QUEUE.unshift({
+                    id: newStoryId,
+                    title: storyTitle,
+                    timestamp: 'Just now',
+                    tags: ['#Manual', '#Completed']
+                  });
+                  approvalSlot.innerHTML = '';
+                  var runBody = card.querySelector('.run-card-body');
+                  if (runBody) runBody.style.maxHeight = 'none';
+                  timelineEl.style.display = 'none';
+                  resultSlot.innerHTML = renderPushSummary(newStoryId);
+                  wirePushFlow(newStoryId);
                 });
-                resultSlot.innerHTML = renderPushSummary(newStoryId);
-                wirePushFlow(newStoryId);
-              });
-              resultSlot.querySelector('[data-action="dismiss"]').addEventListener('click', function() {
-                resultSlot.innerHTML = '';
-              });
+              }
+              if (dismissBtn) {
+                dismissBtn.addEventListener('click', function() {
+                  resultSlot.innerHTML = '';
+                });
+              }
               ConversationManager.addMessage({
                 id: 'msg_' + Math.random().toString(36).slice(2, 10),
                 conversationId: ConversationManager.activeId,
@@ -7718,39 +7747,82 @@
         setTimeout(tick, 250);
       }
 
-      function terminateStoryFlow() {
+      function terminateStoryFlow(completedStage) {
+        var stageLabels = { 0: 'Matrix Verify', 1: 'Retrieval', 2: 'Insights', 3: 'Validation', 4: 'Specification' };
+        completedStage = completedStage || 0;
+
         for (var s = i; s < steps.length; s++) {
-          steps[s].classList.add('done');
+          steps[s].classList.remove('active');
         }
-        timelineEl.style.display = 'none';
+
         headDot.className = 'run-status-dot blocked';
         headBadge.className = 'qbadge blocked';
         headBadge.textContent = 'Terminated';
         headText.textContent = 'Terminated';
+
         var desc = runContext.storyDescription || 'your story';
+        var kb = runContext.kb || 'Knowledge Base';
         var filesNote = runContext.contextFiles.length > 0
           ? '<br><span style="font-size:11px;color:#991B1B;">' + runContext.contextFiles.length + ' context file(s) were attached but not processed.</span>'
           : '';
+
+        var completedStages = [];
+        for (var cs = 1; cs <= completedStage; cs++) {
+          completedStages.push(stageLabels[cs]);
+        }
+        var completedNote = completedStages.length > 0
+          ? '<span style="font-weight:600;color:var(--orange);">Completed:</span> ' + completedStages.join(' → ') + '.'
+          : '<span style="font-weight:600;color:var(--ink-soft);">No pipeline stages completed yet.</span>';
+
+        var nextStage = completedStage < 4 ? stageLabels[completedStage + 1] : null;
+        var nextNote = nextStage
+          ? '<br>The next stage (<b>' + nextStage + '</b>) was not started.'
+          : '';
+
+        var storyId = 'ud_dyn_' + Math.random().toString(36).slice(2, 8);
+        var existingStory = USER_STORIES_ACTIVE_DRAFT.find(function(s) {
+          return s.title.toLowerCase() === desc.toLowerCase();
+        });
+        if (!existingStory) {
+          USER_STORIES_ACTIVE_DRAFT.push({
+            id: storyId,
+            title: desc,
+            stage: Math.max(completedStage, 1),
+            timestamp: 'Just now',
+            tags: ['#Manual', '#Terminated'],
+            kb: kb
+          });
+          window.storyStageState[storyId] = Math.max(completedStage, 1);
+        } else {
+          storyId = existingStory.id;
+          existingStory.stage = Math.max(completedStage, 1);
+          existingStory.timestamp = 'Just now';
+          if (!existingStory.tags.includes('#Terminated')) existingStory.tags.push('#Terminated');
+          window.storyStageState[storyId] = Math.max(completedStage, 1);
+        }
+
         approvalSlot.innerHTML =
           '<div class="terminated-card">' +
-            '<div class="dc-head"><b>Flow Terminated</b></div>' +
-            '<div class="dc-message">The story generation process for "' + desc + '" has been terminated by user.' + filesNote + '</div>' +
+            '<div class="dc-head"><b>Process Terminated — ' + (stageLabels[completedStage] || 'In Progress') + '</b></div>' +
+            '<div class="dc-message">' +
+              'Story generation for "' + desc + '" was terminated by user.' +
+              '<br><br>' + completedNote + nextNote + filesNote +
+              '<br><br><span style="font-size:11px;color:var(--ink-soft);">💡 Run <b>/stories-active</b> to view this story in its last updated state.</span>' +
+            '</div>' +
             '<div class="dc-actions">' +
-              '<button class="dc-secondary" data-action="dismiss">Dismiss</button>' +
+              '<button class="dc-secondary" data-action="open-wizard" data-completed-stage="' + completedStage + '">📋 Open Wizard</button>' +
             '</div>' +
           '</div>';
-        approvalSlot.querySelector('[data-action="dismiss"]').addEventListener('click', function() {
-          approvalSlot.innerHTML = '';
-        });
         ConversationManager.addMessage({
           id: 'msg_' + Math.random().toString(36).slice(2, 10),
           conversationId: ConversationManager.activeId,
           sender: 'agent',
-          content: 'Story generation for "' + desc + '" was terminated by user.',
+          content: 'Story generation for "' + desc + '" was terminated at ' + (stageLabels[completedStage] || 'in progress') + '. Saved with ' + completedStages.length + ' completed stage(s).',
           attachments: [],
           toolCalls: [],
           timestamp: new Date().toISOString(),
-          status: 'terminated'
+          status: 'terminated',
+          runCardHtml: card.outerHTML
         });
         UIManager.renderConversationList();
       }
@@ -7858,6 +7930,7 @@
             '<div class="dc-actions">' +
               '<button class="dc-primary" data-action="add-context">📎 Add Context</button>' +
               '<button class="dc-secondary" data-action="proceed">▶ Proceed with Retrieval</button>' +
+              '<button class="dc-danger" data-action="terminate">✕ Terminate Process</button>' +
             '</div>' +
           '</div>';
 
@@ -7868,7 +7941,7 @@
               tag.className = 'revtag';
               tag.textContent = 'FILES ATTACHED';
               steps[1].appendChild(tag);
-              resumeStoryFlow();
+              showStoryNextStageDecision(1);
             },
             function onUploadCancel() {
               showContinueOrAddContext();
@@ -7881,7 +7954,11 @@
           tag.className = 'revtag';
           tag.textContent = 'APPROVED';
           steps[1].appendChild(tag);
-          resumeStoryFlow();
+          showStoryNextStageDecision(1);
+        });
+
+        approvalSlot.querySelector('[data-action="terminate"]').addEventListener('click', function() {
+          terminateStoryFlow(0);
         });
       }
 
@@ -7896,6 +7973,7 @@
             '<div class="dc-actions">' +
               '<button class="dc-primary" data-action="proceed">▶ Continue Retrieval</button>' +
               '<button class="dc-secondary" data-action="add-context">📎 Add Context</button>' +
+              '<button class="dc-danger" data-action="terminate">✕ Terminate Process</button>' +
             '</div>' +
           '</div>';
 
@@ -7904,7 +7982,7 @@
           tag.className = 'revtag';
           tag.textContent = 'APPROVED';
           steps[1].appendChild(tag);
-          resumeStoryFlow();
+          showStoryNextStageDecision(1);
         });
         approvalSlot.querySelector('[data-action="add-context"]').addEventListener('click', function() {
           showInlineUploadCard(
@@ -7913,12 +7991,15 @@
               tag.className = 'revtag';
               tag.textContent = 'FILES ATTACHED';
               steps[1].appendChild(tag);
-              resumeStoryFlow();
+              showStoryNextStageDecision(1);
             },
             function onUploadCancel() {
               showContinueOrAddContext();
             }
           );
+        });
+        approvalSlot.querySelector('[data-action="terminate"]').addEventListener('click', function() {
+          terminateStoryFlow(0);
         });
       }
 
@@ -7986,7 +8067,7 @@
         }
 
         approvalSlot.querySelector('[data-action="terminate"]').addEventListener('click', function() {
-          terminateStoryFlow();
+          terminateStoryFlow(completedStep);
         });
       }
 
@@ -8134,7 +8215,21 @@
         });
 
         if (preselectStoryId) {
-          setTimeout(function() { selectStory(preselectStoryId); }, 50);
+          setTimeout(function() {
+            var found = STORY_QUEUE.find(function(s) { return s.id === preselectStoryId; });
+            if (found) {
+              selectedStory = found;
+              resultSlot.querySelectorAll('[data-story-id]').forEach(function(x) { x.classList.remove('active'); });
+              var matchBtn = resultSlot.querySelector('[data-story-id="' + preselectStoryId + '"]');
+              if (matchBtn) matchBtn.classList.add('active');
+              if (preview) {
+                preview.innerHTML =
+                  '<b>Selected Story</b>' +
+                  '<p>' + found.title + '<br>' + found.timestamp + '<br>' + found.tags.join(' ') + '</p>';
+              }
+              if (pushBtn) pushBtn.disabled = false;
+            }
+          }, 50);
         }
       }
 
