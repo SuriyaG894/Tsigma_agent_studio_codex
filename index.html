@@ -3918,6 +3918,492 @@
       text-transform: uppercase;
       letter-spacing: .03em;
     }
+
+    /* ================================================================
+       MODERN UI REFRESH — same theme tokens (orange/ink/navy palette),
+       softer depth, rounder geometry, and small motion cues layered on
+       top of the existing rules below via normal cascade order.
+       ================================================================ */
+    :root {
+      --r-sm: 8px;
+      --r-md: 12px;
+      --r-lg: 16px;
+      --r-xl: 20px;
+      --ease: cubic-bezier(.2, .7, .2, 1);
+      --shadow-xs: 0 1px 2px rgba(23, 26, 33, .05);
+      --shadow-sm: 0 2px 8px rgba(23, 26, 33, .06), 0 1px 2px rgba(23, 26, 33, .04);
+      --shadow-md: 0 8px 24px rgba(23, 26, 33, .08), 0 2px 6px rgba(23, 26, 33, .04);
+      --shadow-lg: 0 20px 48px rgba(23, 26, 33, .14), 0 6px 16px rgba(23, 26, 33, .06);
+      --line-soft: rgba(23, 26, 33, .08);
+    }
+
+    /* -- modern thin scrollbars, everywhere -- */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(23, 26, 33, .18) transparent;
+    }
+
+    *::-webkit-scrollbar {
+      width: 9px;
+      height: 9px;
+    }
+
+    *::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+      background: rgba(23, 26, 33, .16);
+      border-radius: 99px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+      background: rgba(23, 26, 33, .28);
+      background-clip: padding-box;
+    }
+
+    /* -- header: quiet elevation instead of a hard line -- */
+    .header {
+      box-shadow: var(--shadow-xs) !important;
+      border-bottom: 1px solid var(--line-soft) !important;
+    }
+
+    .header .mark,
+    .h-avatar {
+      box-shadow: 0 3px 10px rgba(228, 87, 46, .35) !important;
+    }
+
+    .panel-toggle {
+      border-radius: var(--r-md);
+      box-shadow: var(--shadow-xs);
+      transition: background .15s var(--ease), color .15s var(--ease), box-shadow .15s var(--ease), transform .1s var(--ease);
+    }
+
+    .panel-toggle:hover {
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-1px);
+    }
+
+    .impersonate,
+    .crumb {
+      border-radius: 999px !important;
+      overflow: hidden;
+    }
+
+    .impersonate select {
+      border-radius: 999px !important;
+      cursor: pointer;
+    }
+
+    /* -- sidebar & navigation -- */
+    .sidebar {
+      border-right: 1px solid var(--line-soft);
+    }
+
+    .nav-new-chat {
+      border-radius: var(--r-md);
+      box-shadow: 0 6px 16px rgba(228, 87, 46, .28);
+      transition: background .15s var(--ease), box-shadow .2s var(--ease), transform .1s var(--ease);
+    }
+
+    .nav-new-chat:hover {
+      box-shadow: 0 10px 24px rgba(228, 87, 46, .38);
+      transform: translateY(-1px);
+    }
+
+    .nav-new-chat:active {
+      transform: translateY(0);
+    }
+
+    .nav-item {
+      border-radius: var(--r-sm);
+      transition: background .15s var(--ease), color .15s var(--ease), transform .1s var(--ease);
+    }
+
+    .nav-item:hover {
+      transform: translateX(1px);
+    }
+
+    .sidebar-search .search-field {
+      border-radius: 999px !important;
+      transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
+    }
+
+    .sidebar-search .search-field:focus-within {
+      box-shadow: 0 0 0 3px var(--orange-tint);
+    }
+
+    .filter-pill,
+    .select-chats-btn {
+      border-radius: 999px !important;
+      transition: background .15s var(--ease), border-color .15s var(--ease), transform .1s var(--ease);
+    }
+
+    .conv-card {
+      border-radius: var(--r-md);
+      transition: background .15s var(--ease), box-shadow .15s var(--ease), transform .1s var(--ease);
+    }
+
+    .conv-card:hover {
+      box-shadow: var(--shadow-xs);
+    }
+
+    .conv-card.active {
+      box-shadow: inset 3px 0 0 var(--orange);
+    }
+
+    /* -- composer & command surfaces -- */
+    .composer {
+      border-radius: var(--r-lg) !important;
+      box-shadow: var(--shadow-sm) !important;
+      transition: box-shadow .2s var(--ease), border-color .2s var(--ease);
+    }
+
+    .composer:focus-within {
+      box-shadow: var(--shadow-md), 0 0 0 3px var(--orange-tint) !important;
+    }
+
+    .send-btn {
+      border-radius: 999px !important;
+      box-shadow: 0 4px 14px rgba(228, 87, 46, .35);
+      transition: background .15s var(--ease), box-shadow .15s var(--ease), transform .1s var(--ease);
+    }
+
+    .send-btn:not(:disabled):hover {
+      box-shadow: 0 6px 18px rgba(228, 87, 46, .45);
+      transform: translateY(-1px);
+    }
+
+    .send-btn:disabled {
+      box-shadow: none;
+    }
+
+    .chip {
+      border-radius: 999px !important;
+      transition: background .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease), transform .1s var(--ease);
+    }
+
+    .chip:hover:not(.locked) {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-xs);
+    }
+
+    .dropdown {
+      border-radius: var(--r-md) !important;
+      box-shadow: var(--shadow-lg) !important;
+      overflow: hidden;
+    }
+
+    .dd-item {
+      transition: background .12s var(--ease);
+    }
+
+    .kb-dropdown-trigger,
+    .kb-dropdown-menu {
+      border-radius: var(--r-md) !important;
+      transition: box-shadow .15s var(--ease), border-color .15s var(--ease);
+    }
+
+    .kb-dropdown-trigger:hover {
+      box-shadow: var(--shadow-xs);
+    }
+
+    /* -- cards throughout the feed & panels -- */
+    .run-card,
+    .crew-card,
+    .access-card,
+    .kb-snapshot,
+    .result-box,
+    .conv-card,
+    .modal-result {
+      border-radius: var(--r-lg) !important;
+      box-shadow: var(--shadow-sm) !important;
+      transition: box-shadow .2s var(--ease);
+    }
+
+    .run-card:hover {
+      box-shadow: var(--shadow-md) !important;
+    }
+
+    .roster {
+      border-left: 1px solid var(--line-soft);
+    }
+
+    .crew-status {
+      border-radius: 999px !important;
+    }
+
+    .story-tag,
+    .conf {
+      border-radius: 999px !important;
+    }
+
+    /* -- buttons -- */
+    .modal-actions button,
+    .secondary-btn,
+    .primary-orange-btn,
+    .toolbar-btn {
+      border-radius: var(--r-sm) !important;
+      transition: background .15s var(--ease), color .15s var(--ease), box-shadow .15s var(--ease), transform .1s var(--ease);
+    }
+
+    .modal-actions .primary,
+    .primary-orange-btn {
+      box-shadow: 0 4px 14px rgba(228, 87, 46, .3);
+    }
+
+    .modal-actions .primary:hover,
+    .primary-orange-btn:hover {
+      box-shadow: 0 6px 18px rgba(228, 87, 46, .4);
+      transform: translateY(-1px);
+    }
+
+    .modal-actions .secondary:hover,
+    .secondary-btn:hover,
+    .toolbar-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .field-grid select,
+    .field-grid input,
+    .field-grid textarea {
+      border-radius: var(--r-sm) !important;
+      transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
+    }
+
+    .field-grid select:focus,
+    .field-grid input:focus,
+    .field-grid textarea:focus {
+      box-shadow: 0 0 0 3px var(--orange-tint) !important;
+    }
+
+    /* -- modal -- */
+    .modal-container {
+      border-radius: var(--r-xl) !important;
+      box-shadow: var(--shadow-lg) !important;
+    }
+
+    /* -- respect reduced motion -- */
+    @media (prefers-reduced-motion: reduce) {
+
+      .nav-new-chat,
+      .nav-item,
+      .conv-card,
+      .composer,
+      .send-btn,
+      .chip,
+      .run-card,
+      .panel-toggle,
+      .modal-actions button,
+      .secondary-btn,
+      .primary-orange-btn,
+      .toolbar-btn {
+        transition: none !important;
+      }
+    }
+
+    /* ================================================================
+       CARD CONTENT REFRESH — deeper pass on the cards themselves:
+       feed run-cards, the step timeline inside them, result boxes,
+       badges, and the small info cards (docs, gaps, ACs, metrics).
+       ================================================================ */
+
+    /* -- run card: header & divider -- */
+    .run-card {
+      border-color: var(--line-soft) !important;
+    }
+
+    .run-card-head {
+      padding: 13px 16px;
+      border-radius: var(--r-lg);
+      transition: background .15s var(--ease);
+    }
+
+    .run-card-head:hover {
+      background: rgba(228, 87, 46, .035);
+    }
+
+    .run-card.expanded .run-card-head {
+      border-radius: var(--r-lg) var(--r-lg) 0 0;
+    }
+
+    .run-card.expanded .run-card-body {
+      border-top-color: var(--line-soft) !important;
+    }
+
+    .run-card-inner {
+      padding: 14px 16px 16px;
+    }
+
+    /* status dot gets a soft matching glow instead of sitting flat */
+    .run-status-dot {
+      box-shadow: 0 0 0 4px rgba(30, 142, 90, .14);
+    }
+
+    .run-status-dot.blocked {
+      box-shadow: 0 0 0 4px rgba(196, 57, 46, .14);
+    }
+
+    .run-status-dot.running,
+    .run-status-dot.review {
+      box-shadow: 0 0 0 4px rgba(184, 134, 11, .14);
+    }
+
+    .qbadge {
+      border: 1px solid transparent;
+    }
+
+    .qbadge.ok {
+      border-color: rgba(30, 142, 90, .25);
+    }
+
+    .qbadge.blocked {
+      border-color: rgba(196, 57, 46, .25);
+    }
+
+    .qbadge.running,
+    .qbadge.review {
+      border-color: rgba(184, 134, 11, .25);
+    }
+
+    /* -- step timeline: connected, modern stepper -- */
+    .run-card-inner .step {
+      position: relative;
+      padding-left: 2px;
+    }
+
+    .run-card-inner .step .dot {
+      width: 16px;
+      height: 16px;
+      border-width: 2px;
+      z-index: 1;
+      background: #fff;
+      transition: background .2s var(--ease), border-color .2s var(--ease), box-shadow .2s var(--ease);
+    }
+
+    .run-card-inner .step:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 9px;
+      top: 22px;
+      bottom: -8px;
+      width: 2px;
+      background: var(--line-soft);
+    }
+
+    .run-card-inner .step.done:not(:last-child)::before {
+      background: var(--green-tint);
+    }
+
+    .run-card-inner .step.done .dot {
+      background: var(--green);
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px var(--green-tint);
+    }
+
+    .run-card-inner .step.blocked .dot {
+      box-shadow: 0 0 0 3px var(--red-tint);
+    }
+
+    /* -- result box: from flat grey slab to a real card -- */
+    .result-box {
+      background: #fff;
+      border-radius: var(--r-md) !important;
+      border-color: var(--line-soft) !important;
+      box-shadow: var(--shadow-xs);
+      padding: 14px 16px;
+      position: relative;
+    }
+
+    /* -- deny / approval callouts: rounder + a left accent bar -- */
+    .deny-box,
+    .approval-box {
+      border-radius: var(--r-md) !important;
+      border-left: 3px solid var(--red);
+      padding: 12px 15px;
+    }
+
+    .approval-box {
+      border-left-color: var(--amber);
+    }
+
+    .deny-box .path {
+      border-radius: var(--r-sm);
+    }
+
+    .approval-box textarea {
+      border-radius: var(--r-sm);
+      transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
+    }
+
+    .approval-box textarea:focus {
+      outline: none;
+      border-color: var(--amber);
+      box-shadow: 0 0 0 3px rgba(184, 134, 11, .12);
+    }
+
+    .a-actions button {
+      border-radius: 999px;
+      transition: transform .1s var(--ease), box-shadow .15s var(--ease);
+    }
+
+    .a-actions button:hover {
+      transform: translateY(-1px);
+    }
+
+    /* -- metrics: small stat tiles instead of bare numbers -- */
+    .metrics {
+      gap: 10px;
+    }
+
+    .metrics div {
+      background: var(--bg);
+      border-radius: var(--r-sm);
+      padding: 8px 12px;
+      flex: 1;
+      min-width: 90px;
+    }
+
+    /* -- small info rows: docs, gaps, ACs, narrative, tags -- */
+    .doc-row {
+      border-radius: var(--r-sm) !important;
+      border-color: var(--line-soft) !important;
+      transition: border-color .15s var(--ease), background .15s var(--ease), transform .1s var(--ease);
+    }
+
+    .doc-row:hover {
+      transform: translateX(2px);
+    }
+
+    .doc-wi,
+    .doc-conf,
+    .gap-priority,
+    .story-tag {
+      border-radius: var(--r-sm) !important;
+    }
+
+    .ac-block,
+    .narrative-block {
+      border-radius: var(--r-sm) !important;
+      border-color: var(--line-soft) !important;
+    }
+
+    .ac-block {
+      box-shadow: var(--shadow-xs);
+      transition: box-shadow .15s var(--ease);
+    }
+
+    .ac-block:hover {
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* -- modal head: quieter divider to match the softer palette -- */
+    .modal-head,
+    .modal-actions {
+      border-color: var(--line-soft) !important;
+    }
   </style>
 </head>
 
