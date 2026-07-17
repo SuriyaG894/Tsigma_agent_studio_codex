@@ -1884,6 +1884,12 @@
       margin-right: auto;
     }
 
+    .highlight-pulse {
+      outline: 2px solid var(--orange);
+      outline-offset: 2px;
+      transition: outline-color 0.3s;
+    }
+
     .run-card-head {
       display: flex;
       align-items: center;
@@ -4445,6 +4451,15 @@
       if (window.completedStoryStageState[s.id] === undefined) window.completedStoryStageState[s.id] = 4;
     });
 
+    // Live per-story stage state for Plan pipeline (Stage 5 → 6).
+    window.planStageState = window.planStageState || {};
+    USER_STORIES_STEERING_DOC.forEach(s => {
+      if (window.planStageState[s.id] === undefined) window.planStageState[s.id] = 5;
+    });
+    USER_STORIES_PLAN_GENERATION.forEach(s => {
+      if (window.planStageState[s.id] === undefined) window.planStageState[s.id] = 6;
+    });
+
     const KB_STORY_DATA = {
       "Claims Management KB": {
         title: "Submit Insurance Claims",
@@ -5390,7 +5405,12 @@
       var wizBtn = e.target.closest('.terminated-card [data-action="open-wizard"]');
       if (wizBtn) {
         var stage = parseInt(wizBtn.dataset.completedStage) || 0;
-        openFullStoryWizardModal(null, stage, 'story', stage);
+        var wizardStage = parseInt(wizBtn.dataset.wizardStage);
+        if (!isNaN(wizardStage)) {
+          openFullStoryWizardModal(null, wizardStage, 'steering', wizardStage);
+        } else {
+          openFullStoryWizardModal(null, stage, 'story', stage);
+        }
       }
     });
 
@@ -5447,10 +5467,9 @@
         ["Assembling Story Specification", "Stage 4 · Specification"]
       ],
       '/plan': [
-        ["Analyzing Steering Guidelines", "Stage 5 · Steering Doc"],
-        ["Synthesizing Compliance Parameters", "constitutionCheck.verify()"],
-        ["Mapping Database Schemas", "architectEngine.mapDB()"],
-        ["Designing Phase Timeline", "Stage 6 · Plan"]
+        ["Verifying Matrix Constraints", "matrixEngine.verify()"],
+        ["Generating Steering Document", "Stage 5 · Steering Doc"],
+        ["Generating Implementation Plan", "Stage 6 · Plan"]
       ],
       '/gap': [
         ["Scanning Corpus Ingestion", "gapAnalyzer.scanIndex()"],
@@ -5604,6 +5623,14 @@
     window.openStoryInChat = function (id, section) {
       hideFeedEmpty();
 
+      const existingCard = feed.querySelector('[data-opened-story-id="' + id + '"]');
+      if (existingCard) {
+        existingCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        existingCard.classList.add('highlight-pulse');
+        setTimeout(() => existingCard.classList.remove('highlight-pulse'), 1500);
+        return;
+      }
+
       if (section === 'completed') {
         const story = USER_STORIES_COMPLETED.find(s => s.id === id);
         if (!story) return;
@@ -5632,6 +5659,7 @@
         </div>`;
         const card = document.createElement('div');
         card.className = 'run-card expanded';
+        card.dataset.openedStoryId = id;
         card.innerHTML = `
       <div class="run-card-head">
         <div class="run-status-dot ok"></div>
@@ -5642,8 +5670,9 @@
       <div class="run-card-body">
         <div class="run-card-inner">${bodyInner}</div>
       </div>`;
-        feed.insertBefore(card, feed.firstChild);
+        feed.appendChild(card);
         card.querySelector('.run-card-head').addEventListener('click', () => card.classList.toggle('expanded'));
+        feed.scrollTop = feed.scrollHeight;
         ConversationManager.addMessage({
           id: 'msg_' + Math.random().toString(36).slice(2, 10),
           conversationId: ConversationManager.activeId,
@@ -5661,6 +5690,7 @@
         if (!story) return;
         const card = document.createElement('div');
         card.className = 'run-card expanded';
+        card.dataset.openedStoryId = id;
         card.innerHTML = `
       <div class="run-card-head">
         <div class="run-status-dot ok"></div>
@@ -5677,8 +5707,9 @@
           </div>
         </div>
       </div>`;
-        feed.insertBefore(card, feed.firstChild);
+        feed.appendChild(card);
         card.querySelector('.run-card-head').addEventListener('click', () => card.classList.toggle('expanded'));
+        feed.scrollTop = feed.scrollHeight;
         ConversationManager.addMessage({
           id: 'msg_' + Math.random().toString(36).slice(2, 10),
           conversationId: ConversationManager.activeId,
@@ -5695,6 +5726,7 @@
       const stage = window.storyStageState[id] || story.stage;
       const card = document.createElement('div');
       card.className = 'run-card expanded';
+      card.dataset.openedStoryId = id;
       card.innerHTML = `
     <div class="run-card-head">
       <div class="run-status-dot ok"></div>
@@ -5707,13 +5739,14 @@
         ${renderStoryStageCard(id)}
       </div>
     </div>`;
-      feed.insertBefore(card, feed.firstChild);
+      feed.appendChild(card);
       card.querySelector('.run-card-head').addEventListener('click', () => card.classList.toggle('expanded'));
+      feed.scrollTop = feed.scrollHeight;
       ConversationManager.addMessage({
-        id: 'msg_' + Math.random().toString(36).slice(2, 10),
-        conversationId: ConversationManager.activeId,
-        sender: 'agent',
-        content: `Opened ${story.title} · Stage ${stage} (${STAGE_LABELS[stage]})`,
+          id: 'msg_' + Math.random().toString(36).slice(2, 10),
+          conversationId: ConversationManager.activeId,
+          sender: 'agent',
+          content: `Opened ${story.title} · Stage ${stage} (${STAGE_LABELS[stage]})`,
         attachments: [], toolCalls: [], timestamp: new Date().toISOString(), status: 'completed'
       });
       UIManager.renderConversationList();
@@ -5986,7 +6019,7 @@
       const mode = currentMode();
       const selectedKb = getActiveKb() || 'Claims Management KB';
       const kbData = KB_STORY_DATA[selectedKb] || KB_STORY_DATA["Claims Management KB"];
-      const runContext = { kb: selectedKb, kbData, stageEdits: {}, storyDescription: (key === '/story') ? queryText.replace(/^\/story\s*/i, '').trim() : null, contextFiles: [] };
+      const runContext = { kb: selectedKb, kbData, stageEdits: {}, storyDescription: (key === '/story') ? queryText.replace(/^\/story\s*/i, '').trim() : null, planDescription: (key === '/plan') ? queryText.replace(/^\/plan\s*/i, '').trim() : null, contextFiles: [] };
       window._activeRunContext = runContext;
       if (activeConv && activeConv.title === 'New Conversation') {
         activeConv.title = queryText.slice(0, 42);
@@ -7680,6 +7713,16 @@
             openFullStoryWizardModal(null, 5, 'steering');
           }, 500);
         }
+        if (key === '/plan' && mode === 'manual') {
+          resultSlot.insertAdjacentHTML('beforeend', renderPlanCompleteCard());
+          var planCard = resultSlot.querySelector('.spec-complete-card');
+          var planWizardBtn = planCard ? planCard.querySelector('[data-action="open-wizard"]') : null;
+          if (planWizardBtn) {
+            planWizardBtn.addEventListener('click', function() {
+              openFullStoryWizardModal(null, 6, 'steering', 6);
+            });
+          }
+        }
       }
 
       function showApproval(stepIndex) {
@@ -7688,21 +7731,9 @@
         headBadge.textContent = 'Needs review';
         const stageName = runStages[stepIndex][0];
         let bodyHTML = '';
-        const isPlanFlow = (key === '/plan');
 
-        if (isPlanFlow && stepIndex === 1) {
-          bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">Compliance Parameters — Review before synthesis:</div>' +
-            '<textarea class="approval-edit-input" data-stage="compliance" placeholder="Review compliance parameters..." style="width:100%;min-height:60px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical">All constitutional checks passed for the selected knowledge base scope and role access level.</textarea>';
-        } else if (isPlanFlow && stepIndex === 2) {
-          bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">Database Schema Mapping — Verify entity alignment:</div>' +
-            '<textarea class="approval-edit-input" data-stage="schema" placeholder="Review schema mappings..." style="width:100%;min-height:60px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical">Schema mapping validated against KB entity definitions and field constraints.</textarea>';
-        } else if (isPlanFlow && stepIndex === 3) {
-          bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">Phase Timeline — Review implementation schedule:</div>' +
-            '<textarea class="approval-edit-input" data-stage="timeline" placeholder="Review phase timeline..." style="width:100%;min-height:60px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical">Phase 1: Foundation (Week 1-2) | Phase 2: Core Logic (Week 3-4) | Phase 3: Integration (Week 5-6)</textarea>';
-        } else {
-          bodyHTML = '<div style="font-size:11px;color:var(--ink-soft);margin-bottom:6px"><b>' + stageName + '</b> — Stage ready for review.</div>' +
+        bodyHTML = '<div style="font-size:11px;color:var(--ink-soft);margin-bottom:6px"><b>' + stageName + '</b> — Stage ready for review.</div>' +
             '<textarea class="approval-edit-input" data-stage="general" placeholder="Optional parameters or notes..." style="width:100%;min-height:50px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical">Stage processing completed. Approve to continue or edit parameters before proceeding.</textarea>';
-        }
 
         approvalSlot.innerHTML = '<div class="approval-box">' +
           '<div class="a-head"><b>Review: ' + stageName + '</b></div>' +
@@ -7825,6 +7856,187 @@
           runCardHtml: card.outerHTML
         });
         UIManager.renderConversationList();
+      }
+
+      /* ================= MANUAL /plan FLOW — Decision Cards ================= */
+
+      function resumePlanFlow() {
+        approvalSlot.innerHTML = '';
+        headDot.className = 'run-status-dot running';
+        headBadge.className = 'qbadge running';
+        headBadge.textContent = 'Running · Manual';
+        setTimeout(tick, 250);
+      }
+
+      function terminatePlanFlow(completedStage) {
+        var stageLabels = { 0: 'Matrix Verify', 1: 'Steering Doc', 2: 'Implementation Plan' };
+        completedStage = completedStage || 0;
+
+        for (var s = i; s < steps.length; s++) {
+          steps[s].classList.remove('active');
+        }
+
+        headDot.className = 'run-status-dot blocked';
+        headBadge.className = 'qbadge blocked';
+        headBadge.textContent = 'Terminated';
+        headText.textContent = 'Terminated';
+
+        var desc = runContext.planDescription || 'your implementation plan';
+        var kb = runContext.kb || 'Knowledge Base';
+
+        var completedStages = [];
+        for (var cs = 1; cs <= completedStage; cs++) {
+          completedStages.push(stageLabels[cs]);
+        }
+        var completedNote = completedStages.length > 0
+          ? '<span style="font-weight:600;color:var(--orange);">Completed:</span> ' + completedStages.join(' → ') + '.'
+          : '<span style="font-weight:600;color:var(--ink-soft);">No pipeline stages completed yet.</span>';
+
+        var nextStage = completedStage < 2 ? stageLabels[completedStage + 1] : null;
+        var nextNote = nextStage
+          ? '<br>The next stage (<b>' + nextStage + '</b>) was not started.'
+          : '';
+
+        var storyId = 'plan_dyn_' + Math.random().toString(36).slice(2, 8);
+        if (completedStage >= 2) {
+          var existingStory = USER_STORIES_PLAN_GENERATION.find(function(s) {
+            return s.title.toLowerCase() === desc.toLowerCase();
+          });
+          if (!existingStory) {
+            USER_STORIES_PLAN_GENERATION.push({
+              id: storyId,
+              title: desc,
+              timestamp: 'Just now',
+              tags: ['#Manual', '#Terminated'],
+              kb: kb
+            });
+            window.planStageState[storyId] = 6;
+          } else {
+            storyId = existingStory.id;
+            existingStory.timestamp = 'Just now';
+            if (!existingStory.tags.includes('#Terminated')) existingStory.tags.push('#Terminated');
+            window.planStageState[storyId] = 6;
+          }
+        } else if (completedStage >= 1) {
+          var existingStory = USER_STORIES_STEERING_DOC.find(function(s) {
+            return s.title.toLowerCase() === desc.toLowerCase();
+          });
+          if (!existingStory) {
+            USER_STORIES_STEERING_DOC.push({
+              id: storyId,
+              title: desc,
+              timestamp: 'Just now',
+              tags: ['#Manual', '#Terminated'],
+              kb: kb
+            });
+            window.planStageState[storyId] = 5;
+          } else {
+            storyId = existingStory.id;
+            existingStory.timestamp = 'Just now';
+            if (!existingStory.tags.includes('#Terminated')) existingStory.tags.push('#Terminated');
+            window.planStageState[storyId] = 5;
+          }
+        }
+
+        approvalSlot.innerHTML =
+          '<div class="terminated-card">' +
+            '<div class="dc-head"><b>Process Terminated — ' + (stageLabels[completedStage] || 'In Progress') + '</b></div>' +
+            '<div class="dc-message">' +
+              'Implementation plan generation for "' + desc + '" was terminated by user.' +
+              '<br><br>' + completedNote + nextNote +
+              '<br><br><span style="font-size:11px;color:var(--ink-soft);">💡 Run <b>/stories-steering</b> or <b>/stories-plan</b> to view this in its last updated state.</span>' +
+            '</div>' +
+            '<div class="dc-actions">' +
+              '<button class="dc-secondary" data-action="open-wizard" data-completed-stage="' + completedStage + '" data-wizard-stage="' + (completedStage >= 2 ? 6 : 5) + '">📋 Open Wizard</button>' +
+            '</div>' +
+          '</div>';
+        ConversationManager.addMessage({
+          id: 'msg_' + Math.random().toString(36).slice(2, 10),
+          conversationId: ConversationManager.activeId,
+          sender: 'agent',
+          content: 'Implementation plan for "' + desc + '" was terminated at ' + (stageLabels[completedStage] || 'in progress') + '. Saved with ' + completedStages.length + ' completed stage(s).',
+          attachments: [],
+          toolCalls: [],
+          timestamp: new Date().toISOString(),
+          status: 'terminated',
+          runCardHtml: card.outerHTML
+        });
+        UIManager.renderConversationList();
+      }
+
+      function showPlanSteeringDecision() {
+        var kb = runContext.kb || 'Knowledge Base';
+        var desc = runContext.planDescription || kb;
+        var descLine = desc ? '<br><i style="color:#3B82F6;">"' + desc + '"</i>' : '';
+        approvalSlot.innerHTML =
+          '<div class="decision-card">' +
+            '<div class="dc-head">' +
+              '<span class="dc-agent-icon">🤖</span>' +
+              '<b>Steering Document Generated</b>' +
+            '</div>' +
+            '<div class="dc-message">' +
+              'The Steering Document has been successfully synthesized for <b>' + kb + '</b>.' + descLine +
+              '<br>Review system components, data entities, and API endpoints before proceeding.' +
+            '</div>' +
+            '<div class="dc-actions">' +
+              '<button class="dc-secondary" data-action="open-wizard">📋 Open Wizard</button>' +
+              '<button class="dc-primary" data-action="continue">▶ Generate Implementation Plan</button>' +
+              '<button class="dc-danger" data-action="terminate">✕ Terminate Process</button>' +
+            '</div>' +
+          '</div>';
+
+        approvalSlot.querySelector('[data-action="open-wizard"]').addEventListener('click', function() {
+          openFullStoryWizardModal(null, 5, 'steering', 5);
+        });
+        approvalSlot.querySelector('[data-action="continue"]').addEventListener('click', function() {
+          var tag = document.createElement('span');
+          tag.className = 'revtag';
+          tag.textContent = 'APPROVED';
+          steps[1].appendChild(tag);
+          resumePlanFlow();
+        });
+        approvalSlot.querySelector('[data-action="terminate"]').addEventListener('click', function() {
+          terminatePlanFlow(1);
+        });
+      }
+
+      function showPlanCompleteDecision() {
+        var kb = runContext.kb || 'Knowledge Base';
+        approvalSlot.innerHTML =
+          '<div class="decision-card">' +
+            '<div class="dc-head">' +
+              '<span class="dc-agent-icon">🤖</span>' +
+              '<b>Implementation Plan Complete</b>' +
+            '</div>' +
+            '<div class="dc-message">' +
+              'The implementation plan for <b>' + kb + '</b> has been fully generated including constitution check, phases, and risk assessment.' +
+            '</div>' +
+            '<div class="dc-actions">' +
+              '<button class="dc-secondary" data-action="open-wizard">📋 Open Wizard</button>' +
+              '<button class="dc-danger" data-action="terminate">✕ Terminate Process</button>' +
+            '</div>' +
+          '</div>';
+
+        approvalSlot.querySelector('[data-action="open-wizard"]').addEventListener('click', function() {
+          openFullStoryWizardModal(null, 6, 'steering', 6);
+        });
+        approvalSlot.querySelector('[data-action="terminate"]').addEventListener('click', function() {
+          terminatePlanFlow(2);
+        });
+      }
+
+      function renderPlanCompleteCard() {
+        var kb = runContext.kb || 'Knowledge Base';
+        var desc = runContext.planDescription || kb;
+        return '<div class="spec-complete-card">' +
+          '<div class="dc-head"><b>Implementation Plan Complete</b></div>' +
+          '<div class="dc-message">' +
+            'The implementation plan for "' + desc + '" has been fully generated across all stages.' +
+          '</div>' +
+          '<div class="dc-actions" id="specCompleteActions">' +
+            '<button class="dc-secondary" data-action="open-wizard">📋 Open Pipeline Wizard</button>' +
+          '</div>' +
+        '</div>';
       }
 
       function showInlineUploadCard(onSubmit, onCancel) {
@@ -8274,11 +8486,22 @@
                 }
               }, 900);
             }
+          } else if (mode === 'manual' && key === '/plan') {
+            if (startingStep === 0) {
+              setTimeout(tick, 900);
+            } else if (startingStep === 1) {
+              setTimeout(function() {
+                steps[startingStep].classList.remove('active');
+                showPlanSteeringDecision();
+              }, 1000);
+            } else if (startingStep === 2) {
+              setTimeout(function() {
+                steps[startingStep].classList.remove('active');
+                showPlanCompleteDecision();
+              }, 900);
+            }
           } else if (mode === 'manual' && startingStep !== 0) {
-            setTimeout(() => {
-              steps[startingStep].classList.remove('active');
-              showApproval(startingStep);
-            }, 1000);
+            setTimeout(tick, 900);
           } else {
             setTimeout(tick, 900);
           }
