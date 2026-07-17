@@ -2467,6 +2467,159 @@
       box-shadow: 0 0 0 3px rgba(249, 115, 22, .12);
     }
 
+    /* ---- Push to DevOps: Suggested Linked Items ---- */
+    .suggested-links-block {
+      margin-top: 12px;
+      border: 1px solid var(--blue);
+      border-color: #C7D6F5;
+      background: var(--blue-tint);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .suggested-links-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .suggested-links-head b {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      white-space: nowrap;
+    }
+
+    .suggested-links-head select {
+      flex: 1;
+      max-width: 220px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 11.5px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .suggested-links-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .suggested-link-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    .suggested-link-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .suggested-link-check input[type="checkbox"] {
+      margin-top: 2px;
+      accent-color: var(--orange);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .sl-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.4;
+    }
+
+    .sl-sub {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .sl-badge {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--ink-soft);
+      background: #F1F3F6;
+      padding: 2px 7px;
+      border-radius: 5px;
+    }
+
+    .sl-tag-new {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--blue);
+    }
+
+    .sl-tag-preview {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--blue);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .sl-type-select {
+      flex-shrink: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 11px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+      max-width: 110px;
+    }
+
+    .sl-add-relationship {
+      margin-top: 8px;
+    }
+
+    .sl-add-relationship label {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin: 0 0 6px;
+    }
+
+    .sl-add-relationship input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px 9px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 12px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .sl-add-relationship input:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, .12);
+    }
+
     .result-head {
       display: flex;
       justify-content: space-between;
@@ -6805,15 +6958,39 @@
       </div>`;
       }
 
-      function renderPushSummary(preselectStoryId) {
+      // Step 1 of the /push flow: internally mirrors /stories-completed and prompts the
+      // user to pick which completed story they want to push to Azure DevOps.
+      function renderPushStoryPicker() {
+        var stories = USER_STORIES_COMPLETED;
         return `
-      <div class="modal-result">
+      <div class="result-box">
+        <div class="result-head"><b>Push to DevOps</b><span class="conf">${stories.length} completed ${stories.length === 1 ? 'story' : 'stories'}</span></div>
+        <div class="ac-block"><b>Select the user story which you want to push to ADO</b><p>These are the stories currently in Completed status. Pick one to continue to Azure DevOps.</p></div>
+        <div class="doc-list" id="pushStoryPickerList">
+          ${stories.map(s => `
+            <button type="button" class="doc-row" style="width:100%;text-align:left;cursor:pointer;justify-content:flex-start;" data-push-pick-story-id="${s.id}">
+              <span class="doc-title">${s.title}</span>
+              <span class="doc-wi mono">${s.timestamp}</span>
+              <span class="doc-conf">${s.tags.join(' ')}</span>
+            </button>`).join('')}
+        </div>
+      </div>`;
+      }
+
+      // Step 2 of the /push flow: the actual "Push to DevOps" card for a single, already
+      // selected story. storyId is required — it always comes from renderPushStoryPicker.
+      function renderPushSummary(storyId) {
+        var story = USER_STORIES_COMPLETED.find(s => s.id === storyId) || USER_STORIES_COMPLETED[0];
+        var kbData = KB_STORY_DATA[story.kb];
+        var linkedDocs = (kbData && kbData.retrievedDocs) || RETRIEVED_DOCS;
+        return `
+      <div class="modal-result" data-push-story-id="${story.id}">
         <div class="modal-head">
           <div>
             <b>Push to DevOps</b>
-            <p>Select the user story to push to Azure DevOps.</p>
+            <p>${story.title}</p>
           </div>
-          <span class="conf">Story picker</span>
+          <span class="conf">${story.timestamp}</span>
         </div>
         <div class="modal-body">
           <div class="field-grid">
@@ -6834,23 +7011,48 @@
               <select id="adoSprintSelect">${ADO_CONFIG.sprints.map(x => `<option>${x}</option>`).join('')}</select>
             </div>
           </div>
-          <div class="ac-block" style="margin-top:10px;"><b>Available Stories</b><p>Choose one story title, timestamp, and tags to push.</p></div>
-          <div class="doc-list" id="storyPickerList">
-            ${STORY_QUEUE.map(story => {
-              var isActive = preselectStoryId && story.id === preselectStoryId;
-              var activeStyle = isActive ? 'border-color:var(--orange); background:var(--orange-tint);' : '';
-              return `
-              <button type="button" class="doc-row${isActive ? ' active' : ''}" style="width:100%;text-align:left;align-items:flex-start;cursor:pointer;${activeStyle}" data-story-id="${story.id}">
-                <span class="doc-title">${story.title}</span>
-                <span class="doc-wi mono">${story.timestamp}</span>
-                <span class="doc-conf">${story.tags.join(' ')}</span>
-              </button>`;
-            }).join('')}
+
+          <div class="suggested-links-block">
+            <div class="suggested-links-head">
+              <b>Suggested Linked Items</b>
+              <select id="defaultLinkTypeSelect">
+                <option value="">-- Select Type --</option>
+                <option value="Related">Related</option>
+                <option value="Parent">Parent</option>
+                <option value="Child">Child</option>
+              </select>
+            </div>
+            <div class="suggested-links-list" id="suggestedLinksList">
+              ${linkedDocs.map((d, i) => `
+                <div class="suggested-link-row">
+                  <label class="suggested-link-check">
+                    <input type="checkbox" checked data-link-idx="${i}">
+                    <div>
+                      <div class="sl-title">Work Item #${d.wi}: ${d.title}</div>
+                      <div class="sl-sub">
+                        <span class="sl-badge">Product Backlog Item</span>
+                        <span class="sl-tag-new">(New)</span>
+                        <span class="sl-tag-preview">(Preview)</span>
+                      </div>
+                    </div>
+                  </label>
+                  <select class="sl-type-select">
+                    <option>Related</option>
+                    <option>Parent</option>
+                    <option>Child</option>
+                  </select>
+                </div>`).join('')}
+            </div>
+            <div class="sl-add-relationship">
+              <label>Add Relationship</label>
+              <input type="text" id="addRelationshipInput" placeholder="Search by ID...">
+            </div>
           </div>
-          <div class="ac-block" id="selectedStoryPreview"><b>Selected Story</b><p>${preselectStoryId ? 'Loading...' : 'No story selected yet.'}</p></div>
+
+          <div class="ac-block" style="margin-top:10px;"><b>Selected Story</b><p>${story.title}<br>${story.timestamp}<br>${story.tags.join(' ')}</p></div>
         </div>
         <div class="modal-actions">
-          <button class="primary" data-push-action="push" disabled>Push Selected Story</button>
+          <button class="primary" data-push-action="push">Push Selected Story</button>
           <button class="secondary" data-push-action="cancel">Cancel</button>
         </div>
       </div>`;
@@ -8015,7 +8217,7 @@
           case '/search': return renderSearchSummary();
           case '/upload': return renderUploadSummary();
           case '/import': return renderImportSummary();
-          case '/push': return renderPushSummary();
+          case '/push': return renderPushStoryPicker();
           case '/delete': return renderDeleteSummary();
           case '/story': return renderStoryWizardCard(null, 4, runSeq);
           case '/plan': return renderStoryWizardCard(null, 5, runSeq, 'steering');
@@ -8100,7 +8302,7 @@
         if (key === '/push') {
           handledAsInteractive = true;
           approvalSlot.innerHTML = '';
-          wirePushFlow();
+          wirePushStoryPicker();
         }
 
         if (key === '/stories-active' || key === '/stories-steering' || key === '/stories-plan' || key === '/stories-completed') {
@@ -8161,11 +8363,12 @@
                 pushBtn.addEventListener('click', function() {
                   var storyTitle = runContext.storyDescription || 'User Story';
                   var newStoryId = 'story_' + Math.random().toString(36).slice(2, 8);
-                  STORY_QUEUE.unshift({
+                  USER_STORIES_COMPLETED.unshift({
                     id: newStoryId,
                     title: storyTitle,
                     timestamp: 'Just now',
-                    tags: ['#Manual', '#Completed']
+                    tags: ['#Manual', '#Completed'],
+                    kb: runContext.kb || null
                   });
                   approvalSlot.innerHTML = '';
                   timelineEl.style.display = 'none';
@@ -8787,26 +8990,42 @@
         '</div>';
       }
 
-      function wirePushFlow(preselectStoryId) {
-        var selectedStory = null;
-        var preview = resultSlot.querySelector('#selectedStoryPreview');
+      // Step 1 wiring: the /push command internally lists completed stories (like
+      // /stories-completed) and waits for the user to pick one before opening the actual
+      // Push to DevOps card.
+      function wirePushStoryPicker() {
+        resultSlot.querySelectorAll('[data-push-pick-story-id]').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var storyId = btn.dataset.pushPickStoryId;
+            resultSlot.innerHTML = renderPushSummary(storyId);
+            wirePushFlow(storyId);
+            var story = USER_STORIES_COMPLETED.find(function(s) { return s.id === storyId; });
+            ConversationManager.addMessage({
+              id: 'msg_' + Math.random().toString(36).slice(2, 10),
+              conversationId: ConversationManager.activeId,
+              sender: 'agent',
+              content: 'Selected "' + (story ? story.title : storyId) + '" to push to Azure DevOps',
+              attachments: [],
+              toolCalls: [],
+              timestamp: new Date().toISOString(),
+              status: 'completed',
+              runCardHtml: card.outerHTML
+            });
+            UIManager.renderConversationList();
+          });
+        });
+      }
+
+      // Step 2 wiring: the actual Push to DevOps card for the already-selected story,
+      // including the Suggested Linked Items pulled from that story's retrieval stage.
+      function wirePushFlow(storyId) {
+        var selectedStory = USER_STORIES_COMPLETED.find(function(s) { return s.id === storyId; }) || USER_STORIES_COMPLETED[0];
         var pushBtn = resultSlot.querySelector('[data-push-action="push"]');
         var cancelBtn = resultSlot.querySelector('[data-push-action="cancel"]');
         var connectionSelect = resultSlot.querySelector('#adoConnectionSelect');
         var projectSelect = resultSlot.querySelector('#adoProjectSelect');
         var teamSelect = resultSlot.querySelector('#adoTeamSelect');
         var sprintSelect = resultSlot.querySelector('#adoSprintSelect');
-
-        function addValidation(message) {
-          var note = resultSlot.querySelector('.validation-note');
-          if (!note) {
-            note = document.createElement('div');
-            note.className = 'validation-note';
-            note.style.cssText = 'margin:10px 16px 0;padding:8px 10px;border-radius:10px;background:#FFF7ED;color:var(--orange-hover);font-size:11.5px;border:1px solid #FED7AA;';
-            resultSlot.querySelector('.modal-body').appendChild(note);
-          }
-          note.textContent = message;
-        }
 
         function closeFlow() {
           resultSlot.innerHTML =
@@ -8825,55 +9044,30 @@
           }
         }
 
-        function selectStory(storyId) {
-          selectedStory = STORY_QUEUE.find(function(s) { return s.id === storyId; }) || null;
-          resultSlot.querySelectorAll('[data-story-id]').forEach(function(x) { x.classList.remove('active'); });
-          var btn = resultSlot.querySelector('[data-story-id="' + storyId + '"]');
-          if (btn) {
-            btn.classList.add('active');
-            preview.innerHTML =
-              '<b>Selected Story</b>' +
-              '<p>' + selectedStory.title + '<br>' + selectedStory.timestamp + '<br>' + selectedStory.tags.join(' ') + '</p>';
-            pushBtn.disabled = false;
-          }
+        function getSelectedLinkedItems() {
+          var kbData = KB_STORY_DATA[selectedStory.kb];
+          var linkedDocs = (kbData && kbData.retrievedDocs) || RETRIEVED_DOCS;
+          var checked = [];
+          resultSlot.querySelectorAll('#suggestedLinksList input[type="checkbox"]').forEach(function(cb) {
+            if (cb.checked) {
+              var idx = Number(cb.dataset.linkIdx);
+              if (linkedDocs[idx]) checked.push(linkedDocs[idx]);
+            }
+          });
+          return checked;
         }
 
-        resultSlot.querySelectorAll('[data-story-id]').forEach(function(btn) {
-          btn.addEventListener('click', function() {
-            selectStory(btn.dataset.storyId);
-          });
-        });
-
-        resultSlot.querySelectorAll('[data-story-id]').forEach(function(btn, index, nodes) {
-          btn.tabIndex = 0;
-          btn.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              btn.click();
-            }
-            if (e.key === 'ArrowDown') {
-              e.preventDefault();
-              (nodes[index + 1] || nodes[0]).focus();
-            }
-            if (e.key === 'ArrowUp') {
-              e.preventDefault();
-              (nodes[index - 1] || nodes[nodes.length - 1]).focus();
-            }
-            if (e.key === 'Escape') {
-              closeFlow();
-            }
-          });
-        });
-
         pushBtn.addEventListener('click', function() {
-          if (!selectedStory) {
-            addValidation('Select a user story before pushing to ADO.');
-            return;
-          }
           var connection = connectionSelect.value;
           var project = projectSelect.value;
           var team = teamSelect.value;
           var sprint = sprintSelect.value;
+          var linkedItems = getSelectedLinkedItems();
+          var linkedItemsHtml = linkedItems.length
+            ? '<div class="ac-block"><b>Linked Work Items</b><p>' +
+                linkedItems.map(function(d) { return 'Work Item #' + d.wi + ': ' + d.title; }).join('<br>') +
+              '</p></div>'
+            : '';
           resultSlot.innerHTML =
             '<div class="modal-result">' +
               '<div class="modal-head">' +
@@ -8893,6 +9087,7 @@
                 '</div>' +
                 '<div class="ac-block"><b>Connection</b><p>' + connection + '</p></div>' +
                 '<div class="ac-block"><b>Project</b><p>' + project + '</p></div>' +
+                linkedItemsHtml +
               '</div>' +
               '<div class="modal-actions">' +
                 '<button class="primary">Open Work Item</button>' +
@@ -8915,24 +9110,6 @@
         cancelBtn.addEventListener('click', function() {
           closeFlow();
         });
-
-        if (preselectStoryId) {
-          setTimeout(function() {
-            var found = STORY_QUEUE.find(function(s) { return s.id === preselectStoryId; });
-            if (found) {
-              selectedStory = found;
-              resultSlot.querySelectorAll('[data-story-id]').forEach(function(x) { x.classList.remove('active'); });
-              var matchBtn = resultSlot.querySelector('[data-story-id="' + preselectStoryId + '"]');
-              if (matchBtn) matchBtn.classList.add('active');
-              if (preview) {
-                preview.innerHTML =
-                  '<b>Selected Story</b>' +
-                  '<p>' + found.title + '<br>' + found.timestamp + '<br>' + found.tags.join(' ') + '</p>';
-              }
-              if (pushBtn) pushBtn.disabled = false;
-            }
-          }, 50);
-        }
       }
 
       let i = 0;
