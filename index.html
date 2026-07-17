@@ -1991,7 +1991,8 @@
     }
 
     .run-card.expanded .run-card-body {
-      max-height: 600px;
+      max-height: 2600px;
+      overflow-y: auto;
       border-top: 1px solid var(--line);
     }
 
@@ -8099,8 +8100,6 @@
         if (key === '/push') {
           handledAsInteractive = true;
           approvalSlot.innerHTML = '';
-          var runBody = card.querySelector('.run-card-body');
-          if (runBody) runBody.style.maxHeight = 'none';
           wirePushFlow();
         }
 
@@ -8169,8 +8168,6 @@
                     tags: ['#Manual', '#Completed']
                   });
                   approvalSlot.innerHTML = '';
-                  var runBody = card.querySelector('.run-card-body');
-                  if (runBody) runBody.style.maxHeight = 'none';
                   timelineEl.style.display = 'none';
                   resultSlot.innerHTML = renderPushSummary(newStoryId);
                   wirePushFlow(newStoryId);
