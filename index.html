@@ -42,6 +42,36 @@
       box-sizing: border-box;
     }
 
+    /* ================= KEYBOARD ACCESSIBILITY (GLOBAL) =================
+       Guarantees a visible focus ring on every interactive element when
+       navigating with a keyboard, even where a component resets `outline`
+       for its default state, and gives custom (non-<button>) controls the
+       same pointer affordance as real buttons. */
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    summary:focus-visible,
+    [tabindex]:focus-visible,
+    [role="button"]:focus-visible,
+    [role="option"]:focus-visible,
+    [role="tab"]:focus-visible {
+      outline: 2px solid var(--orange) !important;
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
+
+    [role="button"] {
+      cursor: pointer;
+    }
+
+    [role="button"]:not([tabindex]) {
+      /* Safety net: if a role=button element is ever added without an explicit
+         tabindex, it still becomes reachable by keyboard. */
+      cursor: pointer;
+    }
+
     body {
       margin: 0;
       font-family: 'Manrope', system-ui, sans-serif;
@@ -1731,6 +1761,11 @@
 
     .dd-item:hover {
       background: var(--orange-tint);
+    }
+
+    .dd-item.active {
+      background: var(--orange-tint);
+      box-shadow: inset 3px 0 0 var(--orange);
     }
 
     .dd-item.locked {
@@ -4707,7 +4742,7 @@
             <span class="kb-panel-label">Knowledge Base:</span>
           </div>
           <div class="ctx-div"></div>
-          <div class="crew-header-pill" onclick="toggleRoster()" title="Toggle Agent Roster">
+          <div class="crew-header-pill" onclick="toggleRoster()" tabindex="0" role="button" aria-label="Toggle agent roster" title="Toggle Agent Roster">
             <div class="crew-header-avatars">
               <div class="crew-header-avatar" style="background:var(--orange);">OR</div>
               <div class="crew-header-avatar" style="background:var(--blue);">RT</div>
@@ -5972,26 +6007,97 @@
     const slashDropdown = document.getElementById('slashDropdown');
     const mentionDropdown = document.getElementById('mentionDropdown');
 
+    // Keyboard-accessible autocomplete: cmdInput behaves like an ARIA combobox.
+    // ddActiveList tracks which dropdown ('slash' | 'mention' | null) is currently
+    // open, and ddActiveIndex tracks which suggestion is highlighted so ArrowUp/
+    // ArrowDown/Enter work without needing a mouse.
+    let ddActiveList = null;
+    let ddActiveIndex = -1;
+
+    cmdInput.setAttribute('role', 'combobox');
+    cmdInput.setAttribute('aria-autocomplete', 'list');
+    cmdInput.setAttribute('aria-haspopup', 'listbox');
+    cmdInput.setAttribute('aria-expanded', 'false');
+    slashDropdown.setAttribute('role', 'listbox');
+    slashDropdown.setAttribute('aria-label', 'Slash command suggestions');
+    mentionDropdown.setAttribute('role', 'listbox');
+    mentionDropdown.setAttribute('aria-label', 'Mention suggestions');
+
+    function renderDdItems(container, kind, items) {
+      if (!items.length) {
+        container.innerHTML = `<div class="dd-item locked">
+          <span>${kind === 'slash' ? 'No commands available for your role' : 'No matches'}</span>
+        </div>`;
+        return;
+      }
+      container.innerHTML = items.map((it, i) => `
+        <div class="dd-item" id="${kind}-dd-item-${i}" role="option" aria-selected="false" data-full="${it.full}">
+          <span>${it.label}</span>${it.sub ? `<small>${it.sub}</small>` : ''}
+        </div>`).join('');
+    }
+
+    function setActiveDdIndex(container, index) {
+      const items = container.querySelectorAll('.dd-item:not(.locked)');
+      items.forEach((el, i) => {
+        const isActive = i === index;
+        el.classList.toggle('active', isActive);
+        el.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+      ddActiveIndex = index;
+      const activeEl = items[index];
+      if (activeEl) {
+        cmdInput.setAttribute('aria-activedescendant', activeEl.id);
+        activeEl.scrollIntoView({ block: 'nearest' });
+      } else {
+        cmdInput.removeAttribute('aria-activedescendant');
+      }
+    }
+
+    function closeDropdowns() {
+      slashDropdown.classList.remove('show');
+      mentionDropdown.classList.remove('show');
+      cmdInput.setAttribute('aria-expanded', 'false');
+      cmdInput.removeAttribute('aria-activedescendant');
+      ddActiveList = null;
+      ddActiveIndex = -1;
+    }
+
+    function applyDdSelection(container) {
+      const items = container.querySelectorAll('.dd-item:not(.locked)');
+      const el = items[ddActiveIndex] || items[0];
+      if (!el) return false;
+      const words = cmdInput.value.split(/\s/);
+      words[words.length - 1] = el.dataset.full + ' ';
+      cmdInput.value = words.join(' ');
+      sendBtn.disabled = cmdInput.value.trim().length === 0;
+      closeDropdowns();
+      cmdInput.focus();
+      return true;
+    }
+
     function updateDropdowns() {
       const v = cmdInput.value;
       const lastWord = v.split(/\s/).pop();
       if (lastWord.length > 0 && lastWord[0] === '/') {
         const q = lastWord.slice(1).toLowerCase();
         const matches = COMMANDS.filter(c => (c[0].slice(1).toLowerCase().indexOf(q) === 0 || c[1].toLowerCase().indexOf(q) !== -1) && commandAllowed(c));
-        slashDropdown.innerHTML = matches.length
-          ? matches.map(c => `<div class="dd-item" data-full="${c[0]}"><span>${c[1]}</span><small>${c[0]}</small></div>`).join('')
-          : '<div class="dd-item locked"><span>No commands available for your role</span></div>';
+        renderDdItems(slashDropdown, 'slash', matches.map(c => ({ full: c[0], label: c[1], sub: c[0] })));
         slashDropdown.classList.toggle('show', lastWord.length > 0);
         mentionDropdown.classList.remove('show');
+        ddActiveList = slashDropdown.classList.contains('show') ? 'slash' : null;
+        cmdInput.setAttribute('aria-expanded', ddActiveList ? 'true' : 'false');
+        setActiveDdIndex(slashDropdown, matches.length ? 0 : -1);
       } else if (lastWord.length > 0 && lastWord[0] === '@') {
         const q = lastWord.slice(1).toLowerCase();
         const matches = MENTIONS.filter(m => m.slice(1).toLowerCase().indexOf(q) === 0);
-        mentionDropdown.innerHTML = matches.map(m => `<div class="dd-item"><span>${m}</span></div>`).join('');
+        renderDdItems(mentionDropdown, 'mention', matches.map(m => ({ full: m, label: m })));
         mentionDropdown.classList.toggle('show', matches.length > 0);
         slashDropdown.classList.remove('show');
+        ddActiveList = mentionDropdown.classList.contains('show') ? 'mention' : null;
+        cmdInput.setAttribute('aria-expanded', ddActiveList ? 'true' : 'false');
+        setActiveDdIndex(mentionDropdown, matches.length ? 0 : -1);
       } else {
-        slashDropdown.classList.remove('show');
-        mentionDropdown.classList.remove('show');
+        closeDropdowns();
       }
     }
 
@@ -6009,24 +6115,55 @@
       words[words.length - 1] = item.dataset.full + ' ';
       cmdInput.value = words.join(' ');
       sendBtn.disabled = cmdInput.value.trim().length === 0;
-      slashDropdown.classList.remove('show');
+      closeDropdowns();
       cmdInput.focus();
     });
 
     mentionDropdown.addEventListener('mousedown', (e) => {
       e.preventDefault();
       const item = e.target.closest('.dd-item');
-      if (!item) return;
-      const full = item.querySelector('span').textContent;
+      if (!item || item.classList.contains('locked')) return;
+      const full = item.dataset.full || item.querySelector('span').textContent;
       const words = cmdInput.value.split(/\s/);
       words[words.length - 1] = full + ' ';
       cmdInput.value = words.join(' ');
       sendBtn.disabled = cmdInput.value.trim().length === 0;
-      mentionDropdown.classList.remove('show');
+      closeDropdowns();
       cmdInput.focus();
     });
 
     cmdInput.addEventListener('keydown', (e) => {
+      const activeContainer = ddActiveList === 'slash' ? slashDropdown
+        : ddActiveList === 'mention' ? mentionDropdown
+        : null;
+
+      if (activeContainer && activeContainer.classList.contains('show')) {
+        const items = activeContainer.querySelectorAll('.dd-item:not(.locked)');
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (items.length) setActiveDdIndex(activeContainer, (ddActiveIndex + 1) % items.length);
+          return;
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (items.length) setActiveDdIndex(activeContainer, (ddActiveIndex - 1 + items.length) % items.length);
+          return;
+        }
+        if (e.key === 'Enter') {
+          if (items.length) {
+            e.preventDefault();
+            applyDdSelection(activeContainer);
+            return;
+          }
+        }
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeDropdowns();
+          return;
+        }
+      }
+
       if (e.key === 'Enter' && cmdInput.value.trim()) {
         startRun(cmdInput.value.trim());
       }
@@ -6305,7 +6442,7 @@
         card.className = 'run-card expanded';
         card.dataset.openedStoryId = id;
         card.innerHTML = `
-      <div class="run-card-head">
+      <div class="run-card-head" tabindex="0" role="button" aria-label="Toggle run details">
         <div class="run-status-dot ok"></div>
         <div class="qtext">${story.title}</div>
         <div class="qbadge ok">Opened</div>
@@ -6336,7 +6473,7 @@
         card.className = 'run-card expanded';
         card.dataset.openedStoryId = id;
         card.innerHTML = `
-      <div class="run-card-head">
+      <div class="run-card-head" tabindex="0" role="button" aria-label="Toggle run details">
         <div class="run-status-dot ok"></div>
         <div class="qtext">${story.title}</div>
         <div class="qbadge ok">Opened</div>
@@ -6372,7 +6509,7 @@
       card.className = 'run-card expanded';
       card.dataset.openedStoryId = id;
       card.innerHTML = `
-    <div class="run-card-head">
+    <div class="run-card-head" tabindex="0" role="button" aria-label="Toggle run details">
       <div class="run-status-dot ok"></div>
       <div class="qtext">${story.title}</div>
       <div class="qbadge ok">Opened</div>
@@ -6704,7 +6841,7 @@
     <div class="msg-bubble">
       <div class="msg-content">
         <div class="run-card expanded">
-          <div class="run-card-head">
+          <div class="run-card-head" tabindex="0" role="button" aria-label="Toggle run details">
             <div class="run-status-dot running"></div>
             <div class="qtext">${mode === 'manual' ? 'Running · Manual' : 'Running'}</div>
             <div class="qbadge running">${mode === 'manual' ? 'Manual' : 'Thinking…'}</div>
@@ -7476,7 +7613,7 @@
           <div class="prov-col-head">${c.icon} <span>${provEscape(c.label)}</span><span class="prov-col-count">${colNodes.length}</span></div>
           <div class="prov-col-nodes">
             ${colNodes.map(n => `
-              <div class="prov-node" id="provNode_${n.id}" data-node-id="${n.id}" style="--node-color:${n.color}" onclick="highlightProvenanceNode('${n.id}')" title="Click to trace lineage">
+              <div class="prov-node" id="provNode_${n.id}" data-node-id="${n.id}" style="--node-color:${n.color}" onclick="highlightProvenanceNode('${n.id}')" tabindex="0" role="button" aria-label="Trace lineage for ${n.label || n.id}" title="Click to trace lineage">
                 <div class="prov-node-title">${provEscape(n.label)}</div>
                 ${n.meta ? `<div class="prov-node-meta">${provEscape(n.meta)}</div>` : ''}
               </div>
@@ -8063,7 +8200,7 @@
           </div>
           <div style="display:flex; flex-direction:column; gap:12px;">
             <div class="plan-section" style="border:1px solid var(--line); border-radius:10px; background:#FFF; overflow:hidden;">
-              <div style="padding:12px 16px; border-bottom:1px solid var(--line); background:#FCFDFE; font-weight:700; color:var(--ink); font-size:13.5px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="togglePlanSection(this)">
+              <div style="padding:12px 16px; border-bottom:1px solid var(--line); background:#FCFDFE; font-weight:700; color:var(--ink); font-size:13.5px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="togglePlanSection(this)" tabindex="0" role="button">
                 <span style="display:flex; align-items:center; gap:8px;">🌐 Constitution Check</span>
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span style="font-size:9.5px; font-weight:700; color:var(--green); background:var(--green-tint); padding:2px 8px; border-radius:4px; letter-spacing:0.04em;">COMPLIANCE</span>
@@ -8082,7 +8219,7 @@
 
             ${plan.phases.map((ph, idx) => `
               <div class="plan-section" style="border:1px solid var(--line); border-radius:10px; background:#FFF; overflow:hidden;">
-                <div style="padding:12px 16px; border-bottom:1px solid var(--line); background:#FCFDFE; font-weight:700; color:var(--ink); font-size:13.5px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="togglePlanSection(this)">
+                <div style="padding:12px 16px; border-bottom:1px solid var(--line); background:#FCFDFE; font-weight:700; color:var(--ink); font-size:13.5px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="togglePlanSection(this)" tabindex="0" role="button">
                   <span style="display:flex; align-items:center; gap:8px;">📅 ${ph.name}</span>
                   <div style="display:flex; align-items:center; gap:8px;">
                     <span style="font-size:9.5px; font-weight:700; color:var(--purple); background:var(--blue-tint); padding:2px 8px; border-radius:4px; letter-spacing:0.04em;">${ph.tag.toUpperCase()}</span>
@@ -8101,7 +8238,7 @@
             `).join('')}
 
             <div class="plan-section" style="border:1px solid var(--line); border-radius:10px; background:#FFF; overflow:hidden;">
-              <div style="padding:12px 16px; border-bottom:1px solid var(--line); background:#FCFDFE; font-weight:700; color:var(--ink); font-size:13.5px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="togglePlanSection(this)">
+              <div style="padding:12px 16px; border-bottom:1px solid var(--line); background:#FCFDFE; font-weight:700; color:var(--ink); font-size:13.5px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="togglePlanSection(this)" tabindex="0" role="button">
                 <span style="display:flex; align-items:center; gap:8px;">⚠️ Risks & Constraints</span>
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span style="font-size:9.5px; font-weight:700; color:#8A6512; background:var(--amber-tint); padding:2px 8px; border-radius:4px; letter-spacing:0.04em;">RISKS & SECURITY</span>
@@ -8118,7 +8255,7 @@
             </div>
 
             <div class="plan-section" style="border:1px solid var(--line); border-radius:10px; background:#FFF; overflow:hidden;">
-              <div style="padding:12px 16px; border-bottom:1px solid var(--line); background:#FCFDFE; font-weight:700; color:var(--ink); font-size:13.5px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="togglePlanSection(this)">
+              <div style="padding:12px 16px; border-bottom:1px solid var(--line); background:#FCFDFE; font-weight:700; color:var(--ink); font-size:13.5px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="togglePlanSection(this)" tabindex="0" role="button">
                 <span style="display:flex; align-items:center; gap:8px;">📜 The Constitution</span>
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span style="font-size:9.5px; font-weight:700; color:var(--green); background:var(--green-tint); padding:2px 8px; border-radius:4px; letter-spacing:0.04em;">COMPLIANCE</span>
@@ -8131,7 +8268,7 @@
             </div>
 
             <div class="plan-section" style="border:1px solid var(--line); border-radius:10px; background:#FFF; overflow:hidden;">
-              <div style="padding:12px 16px; border-bottom:1px solid var(--line); background:#FCFDFE; font-weight:700; color:var(--ink); font-size:13.5px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="togglePlanSection(this)">
+              <div style="padding:12px 16px; border-bottom:1px solid var(--line); background:#FCFDFE; font-weight:700; color:var(--ink); font-size:13.5px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="togglePlanSection(this)" tabindex="0" role="button">
                 <span style="display:flex; align-items:center; gap:8px;">📄 Steering Document</span>
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span style="font-size:9.5px; font-weight:700; color:var(--ink-soft); background:#F1F5F9; padding:2px 8px; border-radius:4px; letter-spacing:0.04em;">GENERAL</span>
@@ -8139,7 +8276,7 @@
                 </div>
               </div>
     <div class="plan-section" style="border:1px solid var(--line); border-radius:10px; background:#FFF; overflow:hidden;">
-              <div style="padding:12px 16px; border-bottom:1px solid var(--line); background:#FCFDFE; font-weight:700; color:var(--ink); font-size:13.5px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="togglePlanSection(this)">
+              <div style="padding:12px 16px; border-bottom:1px solid var(--line); background:#FCFDFE; font-weight:700; color:var(--ink); font-size:13.5px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="togglePlanSection(this)" tabindex="0" role="button">
                 <span style="display:flex; align-items:center; gap:8px;">💻 Technical Context (Architecture & Legacy APIs)</span>
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span style="font-size:9.5px; font-weight:700; color:var(--purple); background:var(--blue-tint); padding:2px 8px; border-radius:4px; letter-spacing:0.04em;">BACKEND & DB</span>
@@ -8748,7 +8885,7 @@
               '<span>' + icon + '</span>' +
               '<span class="file-name">' + f.name + '</span>' +
               '<span class="file-size">' + size + '</span>' +
-              '<span class="file-remove" data-idx="' + idx + '">&times;</span>' +
+              '<span class="file-remove" data-idx="' + idx + '" tabindex="0" role="button" aria-label="Remove file">&times;</span>' +
             '</div>';
           }).join('');
           listEl.querySelectorAll('.file-remove').forEach(function(btn) {
@@ -9879,12 +10016,22 @@
 
     document.getElementById('slashBtn').addEventListener('click', (e) => {
       e.stopPropagation();
+      const willShow = !slashDropdown.classList.contains('show');
+      // Focus first: this may fire cmdInput's own 'focus' listener (updateDropdowns),
+      // which — since the input is often empty — would otherwise close the dropdown
+      // we're about to open. Rendering and showing it AFTER focus() wins instead.
+      cmdInput.focus();
       const allowed = COMMANDS.filter(c => commandAllowed(c));
-      slashDropdown.innerHTML = allowed.length
-        ? allowed.map(c => `<div class="dd-item" data-full="${c[0]}"><span>${c[1]}</span><small>${c[0]}</small></div>`).join('')
-        : '<div class="dd-item locked"><span>No commands available for your role</span></div>';
-      slashDropdown.classList.toggle('show');
+      renderDdItems(slashDropdown, 'slash', allowed.map(c => ({ full: c[0], label: c[1], sub: c[0] })));
       mentionDropdown.classList.remove('show');
+      if (willShow) {
+        slashDropdown.classList.add('show');
+        ddActiveList = 'slash';
+        cmdInput.setAttribute('aria-expanded', 'true');
+        setActiveDdIndex(slashDropdown, allowed.length ? 0 : -1);
+      } else {
+        closeDropdowns();
+      }
     });
 
     document.addEventListener('click', (e) => {
@@ -10175,7 +10322,7 @@
             (kbs.length > 2 ? `<span class="kb-badge kb-badge-more">+${kbs.length - 2}</span>` : '')
           : '<span class="kb-badge kb-badge-none">No KB</span>';
         return `
-      <div class="conv-card ${ConversationManager.activeId === c.id ? 'active' : ''}" data-conv-id="${c.id}">
+      <div class="conv-card ${ConversationManager.activeId === c.id ? 'active' : ''}" data-conv-id="${c.id}" tabindex="0" role="button" aria-label="Open conversation ${c.title}">
         <div class="conv-card-header">
           <div class="conv-meta">
             <div class="conv-title">${c.title}${pinIcon}</div>
@@ -10214,7 +10361,7 @@
         }
         section.style.display = '';
         list.innerHTML = recent.map(c => `
-          <div class="nav-recent-item ${ConversationManager.activeId === c.id ? 'active' : ''}" data-conv-id="${c.id}">
+          <div class="nav-recent-item ${ConversationManager.activeId === c.id ? 'active' : ''}" data-conv-id="${c.id}" tabindex="0" role="button" aria-label="Open conversation ${c.title}">
             <span class="nav-recent-dot"></span>
             <span class="nav-recent-title">${c.title}${c.isPinned ? ' 📌' : ''}</span>
             <div class="nav-recent-menu">
@@ -10398,7 +10545,22 @@
     document.querySelector('.roster').classList.toggle('open', localStorage.getItem('kb_agent_studio_roster_open') === '1');
     UIManager.setConversationFilter(localStorage.getItem(STORAGE_KEYS.conversationFilter) || 'all');
 
+    // Global keyboard activation: lets custom controls that aren't native
+    // <button>/<a> elements (marked with role="button" + tabindex) be
+    // operated with Enter or Space, same as a real button would be.
     document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+      const target = e.target.closest('[role="button"][tabindex]');
+      if (!target) return;
+      if (['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName)) return;
+      e.preventDefault();
+      target.click();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const tag = (e.target.tagName || '').toLowerCase();
+      const isFormField = tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable;
+
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
         e.preventDefault();
         WorkspaceManager.newConversation();
@@ -10407,7 +10569,7 @@
         e.preventDefault();
         document.getElementById('conversationSearch').focus();
       }
-      if (e.key === 'Delete' && ConversationManager.active && confirm('Delete the selected conversation?')) {
+      if (e.key === 'Delete' && !isFormField && ConversationManager.active && confirm('Delete the selected conversation?')) {
         ConversationManager.state = ConversationManager.state.filter(c => c.id !== ConversationManager.activeId);
         ConversationManager.activeId = ConversationManager.state[0]?.id || null;
         ConversationManager.save();
@@ -10415,6 +10577,23 @@
         WorkspaceManager.loadConversation();
       }
       if (e.key === 'Escape') {
+        // Close any dynamically-created modal overlay via its own dismiss/cancel
+        // path (so pending promises resolve/cleanup correctly) instead of just
+        // yanking it out of the DOM.
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+          if (overlay.style.display === 'none') return;
+          const dismissBtn = overlay.querySelector('.modal-close-btn, [data-upload-action="cancel"], [data-upload-action="close"], [data-action="dismiss"]');
+          if (dismissBtn) dismissBtn.click();
+          else overlay.remove();
+        });
+        const stageModal = document.getElementById('stageWizardModal');
+        if (stageModal && stageModal.style.display !== 'none' && window.closeStoryWizardModal) {
+          window.closeStoryWizardModal();
+        }
+        const roster = document.querySelector('.roster');
+        if (roster && roster.classList.contains('open')) {
+          setRosterState(false);
+        }
         document.querySelectorAll('.conv-menu-panel.show').forEach(panel => panel.classList.remove('show'));
         document.getElementById('conversationSearch').blur();
       }
