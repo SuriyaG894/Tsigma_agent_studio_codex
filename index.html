@@ -3941,7 +3941,8 @@
             <option value="ba_admin">BA ADMIN</option>
             <option value="dev_admin">DEV ADMIN</option>
             <option value="both">FULL STACK</option>
-            <option value="admin">SUPER ADMIN</option>
+            <option value="admin">SYSTEM ADMIN</option>
+            <option value="super_admin">SUPER ADMIN</option>
           </select>
         </div>
         <span class="h-email" id="hEmail"></span>
@@ -4222,7 +4223,8 @@
       ba_admin: { label: "BA ADMIN" },
       dev_admin: { label: "DEV ADMIN" },
       both: { label: "FULL STACK" },
-      admin: { label: "SUPER ADMIN" }
+      admin: { label: "SYSTEM ADMIN" },      // admin/owner: bypasses local KB checks entirely
+      super_admin: { label: "SUPER ADMIN" }  // isSuperAdmin flag: does NOT bypass; must be explicitly assigned KB access
     };
 
     // Static initial mapping assignments per item in selection
@@ -4244,8 +4246,8 @@
       ["/plan", "Create Implementation Plan", ["developer", "dev_admin", "both", "admin"], "read"],
       ["/gap", "Find Knowledge Gap", ["ba", "ba_admin", "both", "admin"], "read"],
       ["/access", "Edit KB Access Control", ["both", "admin"], "admin"],
-      ["/kbadmin", "Open KB Admin Panel", ["admin"], "admin"],
-      ["/settings", "System Settings", ["admin"], null],
+      ["/kbadmin", "Open KB Admin Panel", ["admin", "super_admin"], "admin"],
+      ["/settings", "System Settings", ["admin", "super_admin"], null],
       ["/stories-active", "List User Stories in Active Draft", ["ba", "ba_admin", "both", "admin"], "read"],
       ["/stories-steering", "List User Stories in Steering Doc", ["developer", "dev_admin", "both", "admin"], "read"],
       ["/stories-plan", "List User Stories in Plan Generation", ["developer", "dev_admin", "both", "admin"], "read"],
@@ -5120,11 +5122,15 @@
 
     /* ================= THE ROLE BASED ACCESS MATRIX ENGINE ================= */
     function checkMatrixPermission(action, role, accessLevel) {
-      if (role === 'admin') return true; // Super Admin bypasses locks
+      // Global Admin / Owner bypass: System Admin skips all local KB-level checks below.
+      // Super Admin (isSuperAdmin) intentionally does NOT bypass — it must fall through
+      // to the same accessLevel-gated checks as every other role.
+      if (role === 'admin') return true;
 
       switch (action) {
         case '/newkb':
-          // Ability to create KB: BA=No, DEV=No, BA ADMIN=Yes, DEV ADMIN=Yes, FULL STACK=Yes
+          // Ability to create KB: BA=No, DEV=No, BA ADMIN=Yes, DEV ADMIN=Yes, FULL STACK=Yes,
+          // SUPER ADMIN=No (must use the Admin Panel to explicitly assign itself access instead).
           return ['ba_admin', 'dev_admin', 'both'].includes(role);
 
         case '/search':
@@ -5175,6 +5181,12 @@
           }
           return false;
 
+        case '/kbadmin':
+        case '/settings':
+          // System-level tools, not KB-scoped: only System Admin (bypassed above) or Super Admin.
+          // A high per-KB access level (e.g. owning a KB as BA/BA Admin) must NOT unlock these.
+          return role === 'super_admin';
+
         default:
           // Fallback fallback verification mapping checks
           return ['admin'].includes(accessLevel);
@@ -5201,17 +5213,11 @@
 
     function renderChips() {
       const chipRow = document.getElementById('chipRow');
-      chipRow.innerHTML = COMMANDS.filter(c => CHIP_FEATURED.includes(c[0])).map(c => {
-        const locked = !commandAllowed(c);
-        return `<span class="chip ${locked ? 'locked' : ''}" data-label="${c[1]}">${locked ? '🔒 ' : ''}${c[0]}</span>`;
-      }).join('');
+      const allowed = COMMANDS.filter(c => CHIP_FEATURED.includes(c[0]) && commandAllowed(c));
+      chipRow.innerHTML = allowed.map(c => `<span class="chip" data-label="${c[1]}">${c[0]}</span>`).join('');
 
       chipRow.querySelectorAll('.chip').forEach(el => {
-        el.onclick = () => {
-          if (!el.classList.contains('locked')) {
-            startRun(el.dataset.label);
-          }
-        };
+        el.onclick = () => startRun(el.dataset.label);
       });
     }
 
@@ -5331,13 +5337,11 @@
       const lastWord = v.split(/\s/).pop();
       if (lastWord.length > 0 && lastWord[0] === '/') {
         const q = lastWord.slice(1).toLowerCase();
-        const matches = COMMANDS.filter(c => c[0].slice(1).toLowerCase().indexOf(q) === 0 || c[1].toLowerCase().indexOf(q) !== -1);
-        slashDropdown.innerHTML = matches.map(c => {
-          const locked = !commandAllowed(c);
-          return `<div class="dd-item ${locked ? 'locked' : ''}" data-full="${c[0]}"><span>${c[1]}</span>
-        ${locked ? '<span class="lockflag">🔒 locked</span>' : `<small>${c[0]}</small>`}</div>`;
-        }).join('');
-        slashDropdown.classList.toggle('show', matches.length > 0);
+        const matches = COMMANDS.filter(c => (c[0].slice(1).toLowerCase().indexOf(q) === 0 || c[1].toLowerCase().indexOf(q) !== -1) && commandAllowed(c));
+        slashDropdown.innerHTML = matches.length
+          ? matches.map(c => `<div class="dd-item" data-full="${c[0]}"><span>${c[1]}</span><small>${c[0]}</small></div>`).join('')
+          : '<div class="dd-item locked"><span>No commands available for your role</span></div>';
+        slashDropdown.classList.toggle('show', lastWord.length > 0);
         mentionDropdown.classList.remove('show');
       } else if (lastWord.length > 0 && lastWord[0] === '@') {
         const q = lastWord.slice(1).toLowerCase();
@@ -5963,6 +5967,9 @@
           activeConv.knowledgeBases = [name];
           activeConv.updatedDate = new Date().toISOString();
         }
+        // Creator is granted local 'admin' access on the KB it just created (per RBAC doc:
+        // BA ADMIN / DEV ADMIN / FULL STACK get admin rights on KBs they create).
+        KB_ACCESS_MAPPING[name] = "admin";
         ConversationManager.save();
         syncKbAccessFromActiveConversation();
         resultSlot.innerHTML = `
@@ -6463,7 +6470,7 @@
 
       window.switchStoryWizardStage = function (kb, stageNum, runId, flowType) {
         if (stageNum >= 5) {
-          const roleAllowed = ['developer', 'dev_admin', 'both', 'admin'].includes(currentRole);
+          const roleAllowed = ['developer', 'dev_admin', 'both', 'admin', 'super_admin'].includes(currentRole);
           if (!roleAllowed) {
             alert("Access Denied: Your role does not have permission to view the Steering Doc and Implementation Plan wizard.");
             return;
@@ -6491,7 +6498,7 @@
         }
 
         if (stageNum >= 5) {
-          const roleAllowed = ['developer', 'dev_admin', 'both', 'admin'].includes(currentRole);
+          const roleAllowed = ['developer', 'dev_admin', 'both', 'admin', 'super_admin'].includes(currentRole);
           if (!roleAllowed) {
             alert("Access Denied: Your role does not have permission to view the Steering Doc and Implementation Plan wizard.");
             return;
@@ -6517,7 +6524,7 @@
         const flow = flowType || (activeStage >= 5 ? 'steering' : 'story');
 
         if (activeStage >= 5 || flow === 'steering') {
-          const roleAllowed = ['developer', 'dev_admin', 'both', 'admin'].includes(currentRole);
+          const roleAllowed = ['developer', 'dev_admin', 'both', 'admin', 'super_admin'].includes(currentRole);
           if (!roleAllowed) {
             alert("Access Denied: Your role does not have permission to view the Steering Doc and Implementation Plan wizard.");
             return;
@@ -6907,9 +6914,9 @@
         const stepsContainer = document.querySelector('#stageWizardModal .stage-steps-row');
         let stepsHTML = '';
         let progressWidth = '0%';
-        const isDevRole = ['developer', 'dev_admin', 'both', 'admin'].includes(currentRole);
+        const isDevRole = ['developer', 'dev_admin', 'both', 'admin', 'super_admin'].includes(currentRole);
         const isDevOnly = ['developer', 'dev_admin'].includes(currentRole);
-        const isFullDev = ['both', 'admin'].includes(currentRole);
+        const isFullDev = ['both', 'admin', 'super_admin'].includes(currentRole);
         let stepsData = [];
 
         if (isDevOnly) {
