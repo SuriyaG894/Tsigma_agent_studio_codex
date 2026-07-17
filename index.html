@@ -2157,6 +2157,185 @@
       border-radius: 6px;
     }
 
+    /* ================= MANUAL FLOW: DECISION & ACTION CARDS ================= */
+    .decision-card {
+      margin-top: 8px;
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: 9px;
+      padding: 12px 14px;
+    }
+    .decision-card .dc-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .decision-card .dc-head b, .retrieval-review-card .dc-head b, .spec-complete-card .dc-head b, .terminated-card .dc-head b {
+      font-size: 12.5px;
+      color: #1E40AF;
+    }
+    .decision-card .dc-agent-icon {
+      font-size: 18px;
+    }
+    .decision-card .dc-message, .retrieval-review-card .dc-message, .spec-complete-card .dc-message, .terminated-card .dc-message {
+      font-size: 12px;
+      color: #1E3A5F;
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .decision-card .dc-actions, .retrieval-review-card .dc-actions, .spec-complete-card .dc-actions, .terminated-card .dc-actions, .inline-upload-card .dc-actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+    .dc-primary {
+      background: #0D9488 !important;
+      color: #fff !important;
+      border: none !important;
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .dc-secondary {
+      background: #fff !important;
+      color: #374151 !important;
+      border: 1px solid #D1D5DB !important;
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .dc-secondary:hover {
+      background: #F3F4F6;
+    }
+    .dc-danger {
+      background: transparent !important;
+      color: #DC2626 !important;
+      border: none !important;
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .dc-danger:hover {
+      color: #B91C1C;
+    }
+
+    /* Retrieval Review Card */
+    .retrieval-review-card {
+      margin-top: 8px;
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      border-radius: 9px;
+      padding: 12px 14px;
+    }
+
+    /* Spec Complete Card */
+    .spec-complete-card {
+      margin-top: 8px;
+      background: #F5F3FF;
+      border: 1px solid #DDD6FE;
+      border-radius: 9px;
+      padding: 12px 14px;
+    }
+
+    /* Terminated Card */
+    .terminated-card {
+      margin-top: 8px;
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-radius: 9px;
+      padding: 12px 14px;
+    }
+    .terminated-card .dc-head b {
+      color: #991B1B;
+    }
+    .terminated-card .dc-message {
+      color: #7F1D1D;
+    }
+
+    /* Inline Upload Card */
+    .inline-upload-card {
+      margin-top: 8px;
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: 9px;
+      padding: 12px 14px;
+    }
+    .inline-upload-card .upload-dropzone {
+      border: 2px dashed #93C5FD;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 10px;
+      background: #fff;
+    }
+    .inline-upload-card .upload-dropzone:hover,
+    .inline-upload-card .upload-dropzone.dragover {
+      border-color: #3B82F6;
+      background: #EFF6FF;
+    }
+    .inline-upload-card .upload-dropzone-icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    .inline-upload-card .upload-dropzone-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: #374151;
+    }
+    .inline-upload-card .upload-dropzone-hint {
+      font-size: 10.5px;
+      color: #9CA3AF;
+      margin-top: 2px;
+    }
+    .inline-upload-card .upload-file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    .inline-upload-card .upload-file-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+    .inline-upload-card .upload-file-row .file-name {
+      flex: 1;
+      font-weight: 600;
+      color: #374151;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .inline-upload-card .upload-file-row .file-size {
+      color: #9CA3AF;
+      font-size: 10px;
+    }
+    .inline-upload-card .upload-file-row .file-remove {
+      color: #DC2626;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 0 4px;
+    }
+    .inline-upload-card .upload-file-row .file-remove:hover {
+      color: #B91C1C;
+    }
+
     .result-box {
       margin-top: 10px;
       background: var(--bg);
@@ -3387,6 +3566,25 @@
 
     .stage-step.active .step-label {
       color: var(--orange);
+    }
+
+    /* Blocked/locked state for wizard stages not yet generated */
+    .stage-step.blocked {
+      cursor: not-allowed;
+      opacity: 0.45;
+      pointer-events: none;
+      position: relative;
+    }
+    .stage-step.blocked .step-num {
+      background: #F3F4F6;
+      border-color: #E5E7EB;
+      color: #D1D5DB;
+      font-size: 12px;
+    }
+    .stage-step.blocked .step-label {
+      color: #D1D5DB;
+      text-decoration: line-through;
+      text-decoration-color: #D1D5DB;
     }
 
     /* Actions Toolbar */
@@ -5231,8 +5429,9 @@
       '/story': [
         ["Verifying Matrix Constraints", "matrixEngine.verify()"],
         ["Extracting Source Contexts", "Stage 1 · Retrieval"],
-        ["Synthesizing User Narrative", "Stage 2 · Processing"],
-        ["Assembling Story Specification", "Stage 3 · Output Execution"]
+        ["Synthesizing Insights", "Stage 2 · Insights"],
+        ["Validating Cross-References", "Stage 3 · Validation"],
+        ["Assembling Story Specification", "Stage 4 · Specification"]
       ],
       '/plan': [
         ["Analyzing Steering Guidelines", "Stage 5 · Steering Doc"],
@@ -5774,7 +5973,7 @@
       const mode = currentMode();
       const selectedKb = getActiveKb() || 'Claims Management KB';
       const kbData = KB_STORY_DATA[selectedKb] || KB_STORY_DATA["Claims Management KB"];
-      const runContext = { kb: selectedKb, kbData, stageEdits: {} };
+      const runContext = { kb: selectedKb, kbData, stageEdits: {}, storyDescription: (key === '/story') ? queryText.replace(/^\/story\s*/i, '').trim() : null, contextFiles: [] };
       window._activeRunContext = runContext;
       if (activeConv && activeConv.title === 'New Conversation') {
         activeConv.title = queryText.slice(0, 42);
@@ -6066,7 +6265,7 @@
       </div>`;
       }
 
-      function renderPushSummary() {
+      function renderPushSummary(preselectStoryId) {
         return `
       <div class="modal-result">
         <div class="modal-head">
@@ -6097,14 +6296,18 @@
           </div>
           <div class="ac-block" style="margin-top:10px;"><b>Available Stories</b><p>Choose one story title, timestamp, and tags to push.</p></div>
           <div class="doc-list" id="storyPickerList">
-            ${STORY_QUEUE.map(story => `
-              <button type="button" class="doc-row" style="width:100%;text-align:left;align-items:flex-start;cursor:pointer;" data-story-id="${story.id}">
+            ${STORY_QUEUE.map(story => {
+              var isActive = preselectStoryId && story.id === preselectStoryId;
+              var activeStyle = isActive ? 'border-color:var(--orange); background:var(--orange-tint);' : '';
+              return `
+              <button type="button" class="doc-row${isActive ? ' active' : ''}" style="width:100%;text-align:left;align-items:flex-start;cursor:pointer;${activeStyle}" data-story-id="${story.id}">
                 <span class="doc-title">${story.title}</span>
                 <span class="doc-wi mono">${story.timestamp}</span>
                 <span class="doc-conf">${story.tags.join(' ')}</span>
-              </button>`).join('')}
+              </button>`;
+            }).join('')}
           </div>
-          <div class="ac-block" id="selectedStoryPreview"><b>Selected Story</b><p>No story selected yet.</p></div>
+          <div class="ac-block" id="selectedStoryPreview"><b>Selected Story</b><p>${preselectStoryId ? 'Loading...' : 'No story selected yet.'}</p></div>
         </div>
         <div class="modal-actions">
           <button class="primary" data-push-action="push" disabled>Push Selected Story</button>
@@ -6228,6 +6431,14 @@
       };
 
       window.switchModalStage = function (stageNum) {
+        if (stageNum > (window.activeModalMaxStage || 4)) {
+          var _toast = document.createElement('div');
+          _toast.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1F2937;color:#fff;padding:8px 16px;border-radius:8px;font-size:11.5px;font-weight:600;z-index:10000;box-shadow:0 4px 12px rgba(0,0,0,.2);';
+          _toast.textContent = 'Complete earlier stages in the chat first to unlock this stage.';
+          document.body.appendChild(_toast);
+          setTimeout(function() { _toast.remove(); }, 2500);
+          return;
+        }
         const isDevOnly = ['developer', 'dev_admin'].includes(currentRole);
         if (isDevOnly && stageNum < 4) {
           stageNum = 4;
@@ -6248,7 +6459,7 @@
         renderModalWizardContent();
       };
 
-      window.openFullStoryWizardModal = function (kbName, stageNum, flowType) {
+      window.openFullStoryWizardModal = function (kbName, stageNum, flowType, maxCompletedStage) {
         const kb = kbName || getActiveKb() || 'Claims Management KB';
         const isDevOnly = ['developer', 'dev_admin'].includes(currentRole);
 
@@ -6270,6 +6481,7 @@
         window.activeModalKb = kb;
         window.activeModalStage = activeStage;
         window.activeModalFlowType = flow;
+        window.activeModalMaxStage = maxCompletedStage || activeStage || 4;
 
         const modal = document.getElementById('stageWizardModal');
         if (!modal) return;
@@ -6660,7 +6872,6 @@
             { num: 5, label: 'Steering Doc' },
             { num: 6, label: 'Plan' }
           ];
-          progressWidth = activeStage === 4 ? '0%' : activeStage === 5 ? '50%' : '100%';
         } else if (isFullDev) {
           stepsData = [
             { num: 1, label: 'Retrieval' },
@@ -6670,7 +6881,6 @@
             { num: 5, label: 'Steering Doc' },
             { num: 6, label: 'Plan' }
           ];
-          progressWidth = activeStage === 1 ? '0%' : activeStage === 2 ? '20%' : activeStage === 3 ? '40%' : activeStage === 4 ? '60%' : activeStage === 5 ? '80%' : '100%';
         } else {
           stepsData = [
             { num: 1, label: 'Retrieval' },
@@ -6678,16 +6888,27 @@
             { num: 3, label: 'Validation' },
             { num: 4, label: 'Specification' }
           ];
-          progressWidth = activeStage === 1 ? '0%' : activeStage === 2 ? '33%' : activeStage === 3 ? '66%' : '100%';
         }
+
+        var maxStage = window.activeModalMaxStage || activeStage || 4;
+        var totalSteps = stepsData.length;
+        var accessibleSteps = stepsData.filter(function(s) { return s.num <= maxStage; }).length;
+        progressWidth = totalSteps > 1 ? Math.round(((accessibleSteps - 1) / (totalSteps - 1)) * 100) + '%' : '0%';
 
         stepsHTML = stepsData.map(s => {
           let cls = '';
-          if (s.num < activeStage) cls = 'completed';
-          else if (s.num === activeStage) cls = 'active';
+          if (s.num > maxStage) {
+            cls = 'blocked';
+          } else if (s.num < activeStage) {
+            cls = 'completed';
+          } else if (s.num === activeStage) {
+            cls = 'active';
+          }
+          var clickAttr = cls === 'blocked' ? '' : ' onclick="switchModalStage(' + s.num + ')"';
+          var numContent = cls === 'blocked' ? '🔒' : s.num;
           return `
-        <div class="stage-step ${cls}" data-stage="${s.num}" id="step${s.num}" onclick="switchModalStage(${s.num})">
-          <div class="step-num">${s.num}</div>
+        <div class="stage-step ${cls}" data-stage="${s.num}" id="step${s.num}"${clickAttr}>
+          <div class="step-num">${numContent}</div>
           <span class="step-label">${s.label}</span>
         </div>`;
         }).join('');
@@ -6733,11 +6954,17 @@
 
         let rightButtons = '';
         if (activeStage === 1) {
-          rightButtons = `<button class="toolbar-btn primary-orange-btn" onclick="proceedToInsights()">Analyze Selected Documents →</button>`;
+          rightButtons = maxStage > 1
+            ? `<button class="toolbar-btn primary-orange-btn" onclick="proceedToInsights()">Analyze Selected Documents →</button>`
+            : `<span style="font-size:11px;color:var(--ink-soft);font-style:italic;">Complete retrieval in the chat to proceed</span>`;
         } else if (activeStage === 2) {
-          rightButtons = `<button class="toolbar-btn primary-orange-btn" onclick="switchModalStage(3)">Proceed to Validation →</button>`;
+          rightButtons = maxStage > 2
+            ? `<button class="toolbar-btn primary-orange-btn" onclick="switchModalStage(3)">Proceed to Validation →</button>`
+            : `<span style="font-size:11px;color:var(--ink-soft);font-style:italic;">Complete insights in the chat to proceed</span>`;
         } else if (activeStage === 3) {
-          rightButtons = `<button class="toolbar-btn primary-orange-btn" onclick="switchModalStage(4)">Proceed to Specification →</button>`;
+          rightButtons = maxStage > 3
+            ? `<button class="toolbar-btn primary-orange-btn" onclick="switchModalStage(4)">Proceed to Specification →</button>`
+            : `<span style="font-size:11px;color:var(--ink-soft);font-style:italic;">Complete validation in the chat to proceed</span>`;
         } else if (activeStage === 4) {
           if (flow === 'steering') {
             if (isSteeringDeleted) {
@@ -7332,115 +7559,7 @@
 
         if (key === '/push') {
           handledAsInteractive = true;
-          let selectedStory = null;
-          const preview = resultSlot.querySelector('#selectedStoryPreview');
-          const pushBtn = resultSlot.querySelector('[data-push-action="push"]');
-          const cancelBtn = resultSlot.querySelector('[data-push-action="cancel"]');
-          const connectionSelect = resultSlot.querySelector('#adoConnectionSelect');
-          const projectSelect = resultSlot.querySelector('#adoProjectSelect');
-          const teamSelect = resultSlot.querySelector('#adoTeamSelect');
-          const sprintSelect = resultSlot.querySelector('#adoSprintSelect');
-          const addValidation = (message) => {
-            let note = resultSlot.querySelector('.validation-note');
-            if (!note) {
-              note = document.createElement('div');
-              note.className = 'validation-note';
-              note.style.cssText = 'margin:10px 16px 0;padding:8px 10px;border-radius:10px;background:#FFF7ED;color:var(--orange-hover);font-size:11.5px;border:1px solid #FED7AA;';
-              resultSlot.querySelector('.modal-body').appendChild(note);
-            }
-            note.textContent = message;
-          };
-          const closeFlow = (message) => {
-            resultSlot.innerHTML = `
-          <div class="modal-result">
-            <div class="modal-head">
-              <div>
-                <b>Push to DevOps</b>
-                <p>${message}</p>
-              </div>
-              <span class="conf">Closed</span>
-            </div>
-            <div class="modal-body">
-              <div class="ac-block"><b>Status</b><p>Push flow was cancelled.</p></div>
-            </div>
-          </div>`;
-          };
-          resultSlot.querySelectorAll('[data-story-id]').forEach(btn => btn.addEventListener('click', () => {
-            selectedStory = STORY_QUEUE.find(s => s.id === btn.dataset.storyId) || null;
-            resultSlot.querySelectorAll('[data-story-id]').forEach(x => x.classList.remove('active'));
-            btn.classList.add('active');
-            preview.innerHTML = `
-          <b>Selected Story</b>
-          <p>${selectedStory.title}<br>${selectedStory.timestamp}<br>${selectedStory.tags.join(' ')}</p>`;
-            pushBtn.disabled = false;
-          }));
-          resultSlot.querySelectorAll('[data-story-id]').forEach((btn, index, nodes) => {
-            btn.tabIndex = 0;
-            btn.addEventListener('keydown', (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                btn.click();
-              }
-              if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                (nodes[index + 1] || nodes[0]).focus();
-              }
-              if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                (nodes[index - 1] || nodes[nodes.length - 1]).focus();
-              }
-              if (e.key === 'Escape') {
-                closeFlow('Push flow was cancelled.');
-              }
-            });
-          });
-          pushBtn.addEventListener('click', () => {
-            if (!selectedStory) {
-              addValidation('Select a user story before pushing to ADO.');
-              return;
-            }
-            const connection = connectionSelect.value;
-            const project = projectSelect.value;
-            const team = teamSelect.value;
-            const sprint = sprintSelect.value;
-            resultSlot.innerHTML = `
-          <div class="modal-result">
-            <div class="modal-head">
-              <div>
-                <b>Pushed to DevOps</b>
-                <p>${selectedStory.title} has been pushed to ADO using ${connection}.</p>
-              </div>
-              <span class="conf">${project}</span>
-            </div>
-            <div class="modal-body">
-              <div class="metrics">
-                <div><b>${selectedStory.title}</b>Story</div>
-                <div><b>${selectedStory.timestamp}</b>Timestamp</div>
-                <div><b>${selectedStory.tags.join(' ')}</b>Tags</div>
-                <div><b>${team}</b>Team</div>
-                <div><b>${sprint}</b>Sprint</div>
-              </div>
-              <div class="ac-block"><b>Connection</b><p>${connection}</p></div>
-              <div class="ac-block"><b>Project</b><p>${project}</p></div>
-            </div>
-            <div class="modal-actions">
-              <button class="primary">Open Work Item</button>
-            </div>
-          </div>`;
-            ConversationManager.addMessage({
-              id: 'msg_' + Math.random().toString(36).slice(2, 10),
-              conversationId: ConversationManager.activeId,
-              sender: 'agent',
-              content: `Pushed ${selectedStory.title} to ADO (${connection} / ${project} / ${team} / ${sprint})`,
-              attachments: [],
-              toolCalls: [],
-              timestamp: new Date().toISOString(),
-              status: 'completed',
-              runCardHtml: card.outerHTML
-            });
-            UIManager.renderConversationList();
-          });
-          cancelBtn.addEventListener('click', () => closeFlow('Push flow was cancelled.'));
+          wirePushFlow();
         }
 
         if (key === '/stories-active' || key === '/stories-steering' || key === '/stories-plan' || key === '/stories-completed') {
@@ -7479,7 +7598,51 @@
           feed.scrollTop = feed.scrollHeight;
         }
         UIManager.renderConversationList();
-        if (key === '/story') {
+        if (key === '/story' && mode === 'manual') {
+          resultSlot.innerHTML += renderSpecCompleteCard();
+          var markBtn = resultSlot.querySelector('[data-action="mark-complete"]');
+          var wizardBtn = resultSlot.querySelector('[data-action="open-wizard"]');
+          if (markBtn) {
+            markBtn.addEventListener('click', function() {
+              markBtn.closest('.dc-actions').innerHTML =
+                '<button class="dc-primary" data-action="push-devops">🚀 Push to DevOps</button>' +
+                '<button class="dc-secondary" data-action="dismiss">Dismiss</button>';
+              var head2 = resultSlot.querySelector('.spec-complete-card .dc-head b');
+              if (head2) head2.textContent = 'Story Completed';
+              var msg2 = resultSlot.querySelector('.spec-complete-card .dc-message');
+              if (msg2) msg2.textContent = '"' + (runContext.storyDescription || 'your story') + '" has been marked as completed and moved to the Completed section.';
+              resultSlot.querySelector('[data-action="push-devops"]').addEventListener('click', function() {
+                var storyTitle = runContext.storyDescription || 'User Story';
+                var newStoryId = 'story_' + Math.random().toString(36).slice(2, 8);
+                STORY_QUEUE.unshift({
+                  id: newStoryId,
+                  title: storyTitle,
+                  timestamp: 'Just now',
+                  tags: ['#Manual', '#Completed']
+                });
+                resultSlot.innerHTML = renderPushSummary(newStoryId);
+                wirePushFlow(newStoryId);
+              });
+              resultSlot.querySelector('[data-action="dismiss"]').addEventListener('click', function() {
+                resultSlot.innerHTML = '';
+              });
+              ConversationManager.addMessage({
+                id: 'msg_' + Math.random().toString(36).slice(2, 10),
+                conversationId: ConversationManager.activeId,
+                sender: 'agent',
+                content: 'Story "' + (runContext.storyDescription || 'User Story') + '" marked as completed.',
+                attachments: [], toolCalls: [],
+                timestamp: new Date().toISOString(), status: 'completed'
+              });
+              UIManager.renderConversationList();
+            });
+          }
+          if (wizardBtn) {
+            wizardBtn.addEventListener('click', function() {
+              openFullStoryWizardModal(null, 4, 'story', 4);
+            });
+          }
+        } else if (key === '/story') {
           setTimeout(() => {
             openFullStoryWizardModal(null, 4, 'story');
           }, 500);
@@ -7496,23 +7659,9 @@
         headBadge.textContent = 'Needs review';
         const stageName = runStages[stepIndex][0];
         let bodyHTML = '';
-        const isStoryFlow = (key === '/story');
         const isPlanFlow = (key === '/plan');
 
-        if (isStoryFlow && stepIndex === 1) {
-          const docs = kbData.retrievedDocs || RETRIEVED_DOCS;
-          bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">Retrieved Documents — Review & deselect any irrelevant sources:</div>' +
-            docs.map((d, idx) => '<label class="approval-doc-row" style="display:flex;gap:8px;align-items:center;padding:5px 0;font-size:11px;border-bottom:1px solid #f0f0f0"><input type="checkbox" checked data-doc-idx="' + idx + '" style="accent-color:var(--orange)" /><span style="flex:1;font-weight:600">' + d.title + '</span><span class="mono" style="color:var(--ink-soft);font-size:10px">WI: ' + d.wi + '</span><span style="color:var(--green);font-size:10px;font-weight:600">' + d.confidence + '</span></label>').join('');
-        } else if (isStoryFlow && stepIndex === 2) {
-          const insights = kbData.insights || [];
-          bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">Extracted Insights — Verify processing accuracy:</div>' +
-            insights.map(function(i) { return '<div style="padding:5px 0;font-size:11px;color:var(--ink-soft);border-bottom:1px solid #f0f0f0">&#8226; ' + i + '</div>'; }).join('') +
-            '<textarea class="approval-edit-input" data-stage="insights" placeholder="Add or modify insights..." style="width:100%;min-height:50px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;margin-top:8px;resize:vertical"></textarea>';
-        } else if (isStoryFlow && stepIndex === 3) {
-          var n = kbData.narrative || {};
-          bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">User Story Narrative — Edit before final assembly:</div>' +
-            '<textarea class="approval-edit-input" data-stage="narrative" style="width:100%;min-height:80px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical;line-height:1.6">As ' + (n.role || 'a User') + ',\nI want ' + (n.want || 'to perform an action') + ',\nSo that ' + (n.so || 'the system processes my request efficiently.') + '</textarea>';
-        } else if (isPlanFlow && stepIndex === 1) {
+        if (isPlanFlow && stepIndex === 1) {
           bodyHTML = '<div style="font-size:11px;font-weight:600;color:var(--ink-soft);margin-bottom:6px">Compliance Parameters — Review before synthesis:</div>' +
             '<textarea class="approval-edit-input" data-stage="compliance" placeholder="Review compliance parameters..." style="width:100%;min-height:60px;font-size:11px;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical">All constitutional checks passed for the selected knowledge base scope and role access level.</textarea>';
         } else if (isPlanFlow && stepIndex === 2) {
@@ -7559,6 +7708,436 @@
         });
       }
 
+      /* ================= MANUAL /story FLOW — Decision Cards & Inline Upload ================= */
+
+      function resumeStoryFlow() {
+        approvalSlot.innerHTML = '';
+        headDot.className = 'run-status-dot running';
+        headBadge.className = 'qbadge running';
+        headBadge.textContent = 'Running · Manual';
+        setTimeout(tick, 250);
+      }
+
+      function terminateStoryFlow() {
+        for (var s = i; s < steps.length; s++) {
+          steps[s].classList.add('done');
+        }
+        timelineEl.style.display = 'none';
+        headDot.className = 'run-status-dot blocked';
+        headBadge.className = 'qbadge blocked';
+        headBadge.textContent = 'Terminated';
+        headText.textContent = 'Terminated';
+        var desc = runContext.storyDescription || 'your story';
+        var filesNote = runContext.contextFiles.length > 0
+          ? '<br><span style="font-size:11px;color:#991B1B;">' + runContext.contextFiles.length + ' context file(s) were attached but not processed.</span>'
+          : '';
+        approvalSlot.innerHTML =
+          '<div class="terminated-card">' +
+            '<div class="dc-head"><b>Flow Terminated</b></div>' +
+            '<div class="dc-message">The story generation process for "' + desc + '" has been terminated by user.' + filesNote + '</div>' +
+            '<div class="dc-actions">' +
+              '<button class="dc-secondary" data-action="dismiss">Dismiss</button>' +
+            '</div>' +
+          '</div>';
+        approvalSlot.querySelector('[data-action="dismiss"]').addEventListener('click', function() {
+          approvalSlot.innerHTML = '';
+        });
+        ConversationManager.addMessage({
+          id: 'msg_' + Math.random().toString(36).slice(2, 10),
+          conversationId: ConversationManager.activeId,
+          sender: 'agent',
+          content: 'Story generation for "' + desc + '" was terminated by user.',
+          attachments: [],
+          toolCalls: [],
+          timestamp: new Date().toISOString(),
+          status: 'terminated'
+        });
+        UIManager.renderConversationList();
+      }
+
+      function showInlineUploadCard(onSubmit, onCancel) {
+        var pendingFiles = [];
+        function renderFileList() {
+          var listEl = approvalSlot.querySelector('.upload-file-list');
+          if (!listEl) return;
+          if (pendingFiles.length === 0) {
+            listEl.innerHTML = '';
+            return;
+          }
+          listEl.innerHTML = pendingFiles.map(function(f, idx) {
+            var size = f.size < 1024 ? f.size + ' B' : f.size < 1048576 ? (f.size / 1024).toFixed(1) + ' KB' : (f.size / 1048576).toFixed(1) + ' MB';
+            var icon = f.name.endsWith('.pdf') ? '📄' : f.name.endsWith('.docx') ? '📝' : f.name.endsWith('.csv') ? '📊' : '📃';
+            return '<div class="upload-file-row">' +
+              '<span>' + icon + '</span>' +
+              '<span class="file-name">' + f.name + '</span>' +
+              '<span class="file-size">' + size + '</span>' +
+              '<span class="file-remove" data-idx="' + idx + '">&times;</span>' +
+            '</div>';
+          }).join('');
+          listEl.querySelectorAll('.file-remove').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              pendingFiles.splice(parseInt(btn.dataset.idx), 1);
+              renderFileList();
+            });
+          });
+        }
+
+        approvalSlot.innerHTML =
+          '<div class="inline-upload-card">' +
+            '<div class="dc-head"><b>📎 Add Context Files</b></div>' +
+            '<div class="dc-message">Upload documents to provide additional context for retrieval.</div>' +
+            '<div class="upload-dropzone" data-drop="story">' +
+              '<div class="upload-dropzone-icon">📁</div>' +
+              '<div class="upload-dropzone-text">Drop files here or click to browse</div>' +
+              '<div class="upload-dropzone-hint">PDF, DOCX, TXT, CSV — Max 10MB each</div>' +
+              '<input type="file" class="story-file-input" multiple accept=".pdf,.docx,.txt,.csv" style="display:none">' +
+            '</div>' +
+            '<div class="upload-file-list"></div>' +
+            '<div class="dc-actions">' +
+              '<button class="dc-primary" data-action="submit-upload">Submit</button>' +
+              '<button class="dc-secondary" data-action="cancel-upload">Cancel</button>' +
+            '</div>' +
+          '</div>';
+
+        var dropzone = approvalSlot.querySelector('.upload-dropzone');
+        var fileInput = approvalSlot.querySelector('.story-file-input');
+
+        dropzone.addEventListener('click', function() { fileInput.click(); });
+        dropzone.addEventListener('dragover', function(e) { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', function() { dropzone.classList.remove('dragover'); });
+        dropzone.addEventListener('drop', function(e) {
+          e.preventDefault();
+          dropzone.classList.remove('dragover');
+          var dt = e.dataTransfer;
+          if (dt.files.length) {
+            for (var fi = 0; fi < dt.files.length; fi++) {
+              if (dt.files[fi].size <= 10485760) pendingFiles.push(dt.files[fi]);
+            }
+            renderFileList();
+          }
+        });
+        fileInput.addEventListener('change', function() {
+          for (var fi = 0; fi < fileInput.files.length; fi++) {
+            if (fileInput.files[fi].size <= 10485760) pendingFiles.push(fileInput.files[fi]);
+          }
+          renderFileList();
+          fileInput.value = '';
+        });
+
+        approvalSlot.querySelector('[data-action="submit-upload"]').addEventListener('click', function() {
+          if (pendingFiles.length === 0) {
+            var tip = document.createElement('div');
+            tip.style.cssText = 'font-size:11px;color:#DC2626;margin-bottom:8px;font-weight:600;';
+            tip.textContent = 'Please add at least one file.';
+            approvalSlot.querySelector('.inline-upload-card').insertBefore(tip, approvalSlot.querySelector('.dc-actions'));
+            setTimeout(function() { tip.remove(); }, 2500);
+            return;
+          }
+          runContext.contextFiles = pendingFiles;
+          onSubmit(pendingFiles);
+        });
+
+        approvalSlot.querySelector('[data-action="cancel-upload"]').addEventListener('click', function() {
+          onCancel();
+        });
+      }
+
+      function showStoryAddContextDecision() {
+        var desc = runContext.storyDescription || 'your story';
+        var descLine = desc ? '<br><i style="color:#3B82F6;">"' + desc + '"</i>' : '';
+        approvalSlot.innerHTML =
+          '<div class="decision-card">' +
+            '<div class="dc-head">' +
+              '<span class="dc-agent-icon">🤖</span>' +
+              '<b>Document Retrieval</b>' +
+            '</div>' +
+            '<div class="dc-message">' +
+              'I\'m ready to retrieve relevant documents for your story.' + descLine +
+              '<br>Would you like to provide additional context files before I proceed?' +
+            '</div>' +
+            '<div class="dc-actions">' +
+              '<button class="dc-primary" data-action="add-context">📎 Add Context</button>' +
+              '<button class="dc-secondary" data-action="proceed">▶ Proceed with Retrieval</button>' +
+            '</div>' +
+          '</div>';
+
+        approvalSlot.querySelector('[data-action="add-context"]').addEventListener('click', function() {
+          showInlineUploadCard(
+            function onUploadSubmit(files) {
+              var tag = document.createElement('span');
+              tag.className = 'revtag';
+              tag.textContent = 'FILES ATTACHED';
+              steps[1].appendChild(tag);
+              resumeStoryFlow();
+            },
+            function onUploadCancel() {
+              showContinueOrAddContext();
+            }
+          );
+        });
+
+        approvalSlot.querySelector('[data-action="proceed"]').addEventListener('click', function() {
+          var tag = document.createElement('span');
+          tag.className = 'revtag';
+          tag.textContent = 'APPROVED';
+          steps[1].appendChild(tag);
+          resumeStoryFlow();
+        });
+      }
+
+      function showContinueOrAddContext() {
+        approvalSlot.innerHTML =
+          '<div class="decision-card">' +
+            '<div class="dc-head">' +
+              '<span class="dc-agent-icon">🤖</span>' +
+              '<b>Continue Retrieval?</b>' +
+            '</div>' +
+            '<div class="dc-message">Would you like to continue with retrieval or add different context?</div>' +
+            '<div class="dc-actions">' +
+              '<button class="dc-primary" data-action="proceed">▶ Continue Retrieval</button>' +
+              '<button class="dc-secondary" data-action="add-context">📎 Add Context</button>' +
+            '</div>' +
+          '</div>';
+
+        approvalSlot.querySelector('[data-action="proceed"]').addEventListener('click', function() {
+          var tag = document.createElement('span');
+          tag.className = 'revtag';
+          tag.textContent = 'APPROVED';
+          steps[1].appendChild(tag);
+          resumeStoryFlow();
+        });
+        approvalSlot.querySelector('[data-action="add-context"]').addEventListener('click', function() {
+          showInlineUploadCard(
+            function onUploadSubmit(files) {
+              var tag = document.createElement('span');
+              tag.className = 'revtag';
+              tag.textContent = 'FILES ATTACHED';
+              steps[1].appendChild(tag);
+              resumeStoryFlow();
+            },
+            function onUploadCancel() {
+              showContinueOrAddContext();
+            }
+          );
+        });
+      }
+
+      function showStoryNextStageDecision(completedStep) {
+        var stageLabels = { 1: 'Retrieval', 2: 'Insights', 3: 'Validation', 4: 'Specification' };
+        var nextStageLabels = { 1: 'Insights', 2: 'Validation', 3: 'Specification' };
+        var completedName = stageLabels[completedStep] || 'Stage ' + completedStep;
+        var nextName = nextStageLabels[completedStep];
+        var desc = runContext.storyDescription || '';
+        var kb = runContext.kb || 'Knowledge Base';
+        var docs = kbData.retrievedDocs || RETRIEVED_DOCS;
+
+        if (completedStep === 1) {
+          var fileNote = runContext.contextFiles.length > 0
+            ? '<br>Including ' + runContext.contextFiles.length + ' context file(s) you provided.'
+            : '';
+          approvalSlot.innerHTML =
+            '<div class="retrieval-review-card">' +
+              '<div class="dc-head"><b>Retrieval Complete</b></div>' +
+              '<div class="dc-message">' +
+                'Retrieved ' + docs.length + ' documents from ' + kb + '.' + fileNote +
+                ' What would you like to do next?' +
+              '</div>' +
+              '<div class="dc-actions">' +
+                '<button class="dc-secondary" data-action="open-wizard">📋 Open Wizard</button>' +
+                '<button class="dc-primary" data-action="continue">▶ Generate ' + nextName + '</button>' +
+                '<button class="dc-danger" data-action="terminate">✕ Terminate Process</button>' +
+              '</div>' +
+            '</div>';
+        } else {
+          var actionLabel = nextName ? 'Generate ' + nextName : 'Finish';
+          approvalSlot.innerHTML =
+            '<div class="decision-card">' +
+              '<div class="dc-head"><b>' + completedName + ' Complete</b></div>' +
+              '<div class="dc-message">' +
+                completedName + ' has been successfully generated.' +
+                (nextName ? ' What would you like to do next?' : '') +
+              '</div>' +
+              '<div class="dc-actions">' +
+                '<button class="dc-secondary" data-action="open-wizard">📋 Open Wizard</button>' +
+                (nextName
+                  ? '<button class="dc-primary" data-action="continue">▶ Generate ' + nextName + '</button>'
+                  : '') +
+                '<button class="dc-danger" data-action="terminate">✕ Terminate Process</button>' +
+              '</div>' +
+            '</div>';
+        }
+
+        var wizardBtn = approvalSlot.querySelector('[data-action="open-wizard"]');
+        if (wizardBtn) {
+          wizardBtn.addEventListener('click', function() {
+            openFullStoryWizardModal(null, completedStep, 'story', completedStep);
+          });
+        }
+
+        var continueBtn = approvalSlot.querySelector('[data-action="continue"]');
+        if (continueBtn) {
+          continueBtn.addEventListener('click', function() {
+            var tag = document.createElement('span');
+            tag.className = 'revtag';
+            tag.textContent = 'APPROVED';
+            steps[completedStep].appendChild(tag);
+            resumeStoryFlow();
+          });
+        }
+
+        approvalSlot.querySelector('[data-action="terminate"]').addEventListener('click', function() {
+          terminateStoryFlow();
+        });
+      }
+
+      function renderSpecCompleteCard() {
+        var desc = runContext.storyDescription || 'your user story';
+        return '<div class="spec-complete-card">' +
+          '<div class="dc-head"><b>Specification Complete</b></div>' +
+          '<div class="dc-message">' +
+            'The specification for "' + desc + '" has been fully generated across all stages.' +
+          '</div>' +
+          '<div class="dc-actions" id="specCompleteActions">' +
+            '<button class="dc-primary" data-action="mark-complete">✓ Mark as Completed</button>' +
+            '<button class="dc-secondary" data-action="open-wizard">📋 Open Wizard</button>' +
+          '</div>' +
+        '</div>';
+      }
+
+      function wirePushFlow(preselectStoryId) {
+        var selectedStory = null;
+        var preview = resultSlot.querySelector('#selectedStoryPreview');
+        var pushBtn = resultSlot.querySelector('[data-push-action="push"]');
+        var cancelBtn = resultSlot.querySelector('[data-push-action="cancel"]');
+        var connectionSelect = resultSlot.querySelector('#adoConnectionSelect');
+        var projectSelect = resultSlot.querySelector('#adoProjectSelect');
+        var teamSelect = resultSlot.querySelector('#adoTeamSelect');
+        var sprintSelect = resultSlot.querySelector('#adoSprintSelect');
+
+        function addValidation(message) {
+          var note = resultSlot.querySelector('.validation-note');
+          if (!note) {
+            note = document.createElement('div');
+            note.className = 'validation-note';
+            note.style.cssText = 'margin:10px 16px 0;padding:8px 10px;border-radius:10px;background:#FFF7ED;color:var(--orange-hover);font-size:11.5px;border:1px solid #FED7AA;';
+            resultSlot.querySelector('.modal-body').appendChild(note);
+          }
+          note.textContent = message;
+        }
+
+        function closeFlow() {
+          resultSlot.innerHTML =
+            '<div class="terminated-card">' +
+              '<div class="dc-head"><b>Push Cancelled</b></div>' +
+              '<div class="dc-message">The push to Azure DevOps was cancelled.</div>' +
+              '<div class="dc-actions">' +
+                '<button class="dc-secondary" data-action="dismiss">Dismiss</button>' +
+              '</div>' +
+            '</div>';
+          var dismissBtn = resultSlot.querySelector('[data-action="dismiss"]');
+          if (dismissBtn) {
+            dismissBtn.addEventListener('click', function() {
+              resultSlot.innerHTML = '';
+            });
+          }
+        }
+
+        function selectStory(storyId) {
+          selectedStory = STORY_QUEUE.find(function(s) { return s.id === storyId; }) || null;
+          resultSlot.querySelectorAll('[data-story-id]').forEach(function(x) { x.classList.remove('active'); });
+          var btn = resultSlot.querySelector('[data-story-id="' + storyId + '"]');
+          if (btn) {
+            btn.classList.add('active');
+            preview.innerHTML =
+              '<b>Selected Story</b>' +
+              '<p>' + selectedStory.title + '<br>' + selectedStory.timestamp + '<br>' + selectedStory.tags.join(' ') + '</p>';
+            pushBtn.disabled = false;
+          }
+        }
+
+        resultSlot.querySelectorAll('[data-story-id]').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            selectStory(btn.dataset.storyId);
+          });
+        });
+
+        resultSlot.querySelectorAll('[data-story-id]').forEach(function(btn, index, nodes) {
+          btn.tabIndex = 0;
+          btn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              btn.click();
+            }
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              (nodes[index + 1] || nodes[0]).focus();
+            }
+            if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              (nodes[index - 1] || nodes[nodes.length - 1]).focus();
+            }
+            if (e.key === 'Escape') {
+              closeFlow();
+            }
+          });
+        });
+
+        pushBtn.addEventListener('click', function() {
+          if (!selectedStory) {
+            addValidation('Select a user story before pushing to ADO.');
+            return;
+          }
+          var connection = connectionSelect.value;
+          var project = projectSelect.value;
+          var team = teamSelect.value;
+          var sprint = sprintSelect.value;
+          resultSlot.innerHTML =
+            '<div class="modal-result">' +
+              '<div class="modal-head">' +
+                '<div>' +
+                  '<b>Pushed to DevOps</b>' +
+                  '<p>' + selectedStory.title + ' has been pushed to ADO using ' + connection + '.</p>' +
+                '</div>' +
+                '<span class="conf">' + project + '</span>' +
+              '</div>' +
+              '<div class="modal-body">' +
+                '<div class="metrics">' +
+                  '<div><b>' + selectedStory.title + '</b>Story</div>' +
+                  '<div><b>' + selectedStory.timestamp + '</b>Timestamp</div>' +
+                  '<div><b>' + selectedStory.tags.join(' ') + '</b>Tags</div>' +
+                  '<div><b>' + team + '</b>Team</div>' +
+                  '<div><b>' + sprint + '</b>Sprint</div>' +
+                '</div>' +
+                '<div class="ac-block"><b>Connection</b><p>' + connection + '</p></div>' +
+                '<div class="ac-block"><b>Project</b><p>' + project + '</p></div>' +
+              '</div>' +
+              '<div class="modal-actions">' +
+                '<button class="primary">Open Work Item</button>' +
+              '</div>' +
+            '</div>';
+          ConversationManager.addMessage({
+            id: 'msg_' + Math.random().toString(36).slice(2, 10),
+            conversationId: ConversationManager.activeId,
+            sender: 'agent',
+            content: 'Pushed ' + selectedStory.title + ' to ADO (' + connection + ' / ' + project + ' / ' + team + ' / ' + sprint + ')',
+            attachments: [],
+            toolCalls: [],
+            timestamp: new Date().toISOString(),
+            status: 'completed',
+            runCardHtml: card.outerHTML
+          });
+          UIManager.renderConversationList();
+        });
+
+        cancelBtn.addEventListener('click', function() {
+          closeFlow();
+        });
+
+        if (preselectStoryId) {
+          setTimeout(function() { selectStory(preselectStoryId); }, 50);
+        }
+      }
+
       let i = 0;
       function tick() {
         if (blocked && i === 1) {
@@ -7582,7 +8161,25 @@
         if (startingStep < steps.length) {
           steps[startingStep].classList.add('active');
           i++;
-          if (mode === 'manual' && startingStep !== 0) {
+          if (mode === 'manual' && key === '/story') {
+            if (startingStep === 0) {
+              setTimeout(tick, 900);
+            } else if (startingStep === 1) {
+              setTimeout(function() {
+                steps[startingStep].classList.remove('active');
+                showStoryAddContextDecision();
+              }, 1000);
+            } else if (startingStep >= 2 && startingStep <= 4) {
+              setTimeout(function() {
+                steps[startingStep].classList.remove('active');
+                if (startingStep < steps.length - 1) {
+                  showStoryNextStageDecision(startingStep);
+                } else {
+                  tick();
+                }
+              }, 900);
+            }
+          } else if (mode === 'manual' && startingStep !== 0) {
             setTimeout(() => {
               steps[startingStep].classList.remove('active');
               showApproval(startingStep);
